@@ -1,13 +1,18 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Check, ChevronDown, Plus } from 'lucide-react'
+import { ArrowLeft, Check, ChevronDown, Plus, X } from 'lucide-react'
 import { useWorkspaces } from '../../hooks/useWorkspaces'
+import { useAuth } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
 import type { Workspace } from '../../lib/types'
 import BottomSheet from '../ui/BottomSheet'
-import CreateWorkspaceForm from './CreateWorkspaceForm'
+import Button from '../ui/Button'
+import Input from '../ui/Input'
 import styles from './WorkspaceSwitcher.module.css'
 
 const LAST_WS_KEY = 'pf-last-workspace'
+
+type MobileSheet = 'closed' | 'list' | 'create'
 
 interface Props {
   currentWorkspace: Workspace
@@ -15,12 +20,17 @@ interface Props {
 
 export default function WorkspaceSwitcher({ currentWorkspace }: Props) {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { workspaces, loading, reload } = useWorkspaces()
   const [desktopOpen, setDesktopOpen] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [showCreate, setShowCreate] = useState(false)
+  const [mobileSheet, setMobileSheet] = useState<MobileSheet>('closed')
   const triggerRef = useRef<HTMLButtonElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
+
+  // Create form state (for the mobile sheet create mode)
+  const [createName, setCreateName] = useState('')
+  const [createError, setCreateError] = useState<string | null>(null)
+  const [createLoading, setCreateLoading] = useState(false)
 
   // Close desktop popover on outside click or Escape
   useEffect(() => {
@@ -46,7 +56,7 @@ export default function WorkspaceSwitcher({ currentWorkspace }: Props) {
 
   function handleTriggerClick() {
     if (window.matchMedia('(max-width: 768px)').matches) {
-      setMobileOpen(true)
+      setMobileSheet('list')
     } else {
       setDesktopOpen(prev => !prev)
     }
@@ -55,27 +65,49 @@ export default function WorkspaceSwitcher({ currentWorkspace }: Props) {
   function selectWorkspace(ws: Workspace) {
     if (ws.id === currentWorkspace.id) {
       setDesktopOpen(false)
-      setMobileOpen(false)
+      setMobileSheet('closed')
       return
     }
     localStorage.setItem(LAST_WS_KEY, ws.id)
     setDesktopOpen(false)
-    setMobileOpen(false)
+    setMobileSheet('closed')
     navigate(`/app/${ws.id}/projects`)
   }
 
-  function openCreate() {
-    setDesktopOpen(false)
-    setMobileOpen(false)
-    setShowCreate(true)
-  }
+  const openCreate = useCallback(() => {
+    setCreateName('')
+    setCreateError(null)
+    setMobileSheet('create')
+  }, [])
 
-  function handleCreated() {
-    setShowCreate(false)
+  async function handleCreateSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const trimmed = createName.trim()
+    if (!trimmed) { setCreateError('Workspace name is required.'); return }
+    if (trimmed.length > 100) { setCreateError('Name must be 100 characters or fewer.'); return }
+    if (!user) { setCreateError('Not authenticated.'); return }
+    setCreateError(null)
+    setCreateLoading(true)
+
+    const { data: sessionData } = await supabase.auth.refreshSession()
+    if (!sessionData.session) {
+      setCreateError('Your session has expired. Sign in again.')
+      setCreateLoading(false)
+      return
+    }
+
+    const { data: workspaceId, error } = await supabase.rpc('create_workspace', { p_name: trimmed })
+    setCreateLoading(false)
+    if (error) { setCreateError(error.message); return }
+
+    const id = workspaceId as string
+    localStorage.setItem(LAST_WS_KEY, id)
+    setMobileSheet('closed')
     reload()
+    navigate(`/app/${id}/projects`)
   }
 
-  const workspaceList = (
+  const workspaceListContent = (
     <>
       {loading && workspaces.length === 0 ? (
         <div className={styles.loadingRow}>Loading…</div>
@@ -105,7 +137,7 @@ export default function WorkspaceSwitcher({ currentWorkspace }: Props) {
 
   return (
     <>
-      {/* Trigger button */}
+      {/* Trigger button — sidebar (desktop) or topBar (mobile) */}
       <button
         ref={triggerRef}
         type="button"
@@ -123,26 +155,78 @@ export default function WorkspaceSwitcher({ currentWorkspace }: Props) {
       {desktopOpen && (
         <div ref={popoverRef} className={styles.popover} role="listbox" aria-label="Workspaces">
           <div className={styles.popoverHeader}>Workspaces</div>
-          {workspaceList}
+          {workspaceListContent}
         </div>
       )}
 
-      {/* Mobile bottom sheet */}
-      {mobileOpen && (
-        <BottomSheet onClose={() => setMobileOpen(false)} aria-labelledby="ws-switcher-title">
-          <h2 id="ws-switcher-title" className={styles.sheetTitle}>Workspaces</h2>
-          <div className={styles.sheetList}>
-            {workspaceList}
-          </div>
+      {/* Mobile bottom sheet — single sheet, mode-based content */}
+      {mobileSheet !== 'closed' && (
+        <BottomSheet
+          onClose={() => setMobileSheet('closed')}
+          aria-labelledby={mobileSheet === 'list' ? 'ws-sheet-title' : 'ws-create-title'}
+        >
+          {mobileSheet === 'list' ? (
+            <>
+              <div className={styles.sheetHeaderRow}>
+                <h2 id="ws-sheet-title" className={styles.sheetTitle}>Workspaces</h2>
+                <button
+                  type="button"
+                  className={styles.sheetCloseBtn}
+                  onClick={() => setMobileSheet('closed')}
+                  aria-label="Close"
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              </div>
+              <div className={styles.sheetList}>
+                {workspaceListContent}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.sheetHeaderRow}>
+                <button
+                  type="button"
+                  className={styles.sheetBackBtn}
+                  onClick={() => setMobileSheet('list')}
+                  aria-label="Back to workspace list"
+                >
+                  <ArrowLeft size={16} aria-hidden="true" />
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className={styles.sheetCloseBtn}
+                  onClick={() => setMobileSheet('closed')}
+                  aria-label="Close"
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              </div>
+              <h2 id="ws-create-title" className={styles.sheetTitle}>Create workspace</h2>
+              <p className={styles.sheetSub}>A workspace is where you and your team manage projects together.</p>
+              <form onSubmit={handleCreateSubmit} noValidate>
+                <Input
+                  label="Workspace name"
+                  value={createName}
+                  onChange={e => { setCreateName(e.target.value); setCreateError(null) }}
+                  placeholder="e.g. Acme Corp"
+                  maxLength={100}
+                  autoFocus
+                />
+                {createError ? <p className={styles.sheetError}>{createError}</p> : null}
+                <div className={styles.sheetActions}>
+                  <Button type="button" variant="ghost" onClick={() => setMobileSheet('list')} disabled={createLoading}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" loading={createLoading} disabled={!createName.trim()}>
+                    Create workspace
+                  </Button>
+                </div>
+              </form>
+            </>
+          )}
         </BottomSheet>
-      )}
-
-      {/* Create workspace form */}
-      {showCreate && (
-        <CreateWorkspaceForm
-          onClose={() => setShowCreate(false)}
-          onCreated={handleCreated}
-        />
       )}
     </>
   )

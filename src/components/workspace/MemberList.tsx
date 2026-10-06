@@ -134,8 +134,7 @@ export default function MemberList({ workspaceId, onClose }: Props) {
       try {
         await navigator.share({
           title: 'ProjectFlow workspace invitation',
-          text: "You've been invited to join my ProjectFlow workspace.",
-          url,
+          text: `You're invited!\nJoin my ProjectFlow workspace to collaborate on projects.\n${url}`,
         })
       } catch (err) {
         // User dismissed the share sheet — not an error

@@ -98,6 +98,14 @@ svg {
   --bottom-nav-height: 72px;
   --color-bg-overlay: rgba(0, 0, 0, 0.5);
 
+  /* Z-index layers — always use these, never scatter raw numbers */
+  --z-sticky:         10;   /* topBar */
+  --z-nav:            20;   /* sidebar, mobile bottom nav */
+  --z-popover:        60;   /* desktop popovers inside their stacking context */
+  --z-modal-backdrop: 80;   /* full-screen backdrop; above all nav */
+  --z-modal:         100;   /* bottom sheet / dialog panel */
+  --z-toast:         200;   /* sync indicator, toasts — above modals */
+
   /* Dark sidebar surface (used in both light + dark themes) */
   --sidebar-bg:              #1c1917;
   --sidebar-text:            #e7e3dc;
