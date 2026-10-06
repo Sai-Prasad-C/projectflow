@@ -1,8 +1,9 @@
 .board {
   display: flex;
   gap: var(--space-4);
-  align-items: stretch;
+  align-items: flex-start;
   overflow-x: auto;
+  overflow-y: visible;
   padding-bottom: var(--space-6);
   min-height: calc(100dvh - 200px);
 }
@@ -16,13 +17,14 @@
   border-radius: 3px;
 }
 
-/* Mobile: horizontal snap scroll, each column takes ~85vw */
+/* Mobile: horizontal snap-scroll, each column about 85vw, next peeking */
 @media (max-width: 768px) {
   .board {
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     gap: var(--space-3);
     padding: 0 var(--space-4) var(--space-6);
-    margin: 0 calc(var(--space-4) * -1);
+    /* Pull the board flush with the page edges via parent boardWrap negative margin */
+    min-height: calc(100dvh - 270px);
   }
 }

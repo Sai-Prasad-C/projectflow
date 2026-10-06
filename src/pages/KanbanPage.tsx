@@ -199,17 +199,19 @@ export default function KanbanPage() {
       {loadError ? <p className={styles.error}>{loadError}</p> : null}
       {moveError ? <p className={styles.error}>{moveError}</p> : null}
 
-      <KanbanBoard
-        tasks={tasks}
-        members={members}
-        draggingTaskId={draggingTaskId}
-        onDragStart={setDraggingTaskId}
-        onDragEnd={() => setDraggingTaskId(null)}
-        onMoveTask={handleMoveTask}
-        onAddTask={status => setEditModal({ mode: 'create', defaultStatus: status })}
-        onEditTask={task => setDetailTaskId(task.id)}
-        onDeleteTask={handleDeleteTask}
-      />
+      <div className={styles.boardWrap}>
+        <KanbanBoard
+          tasks={tasks}
+          members={members}
+          draggingTaskId={draggingTaskId}
+          onDragStart={setDraggingTaskId}
+          onDragEnd={() => setDraggingTaskId(null)}
+          onMoveTask={handleMoveTask}
+          onAddTask={status => setEditModal({ mode: 'create', defaultStatus: status })}
+          onEditTask={task => setDetailTaskId(task.id)}
+          onDeleteTask={handleDeleteTask}
+        />
+      </div>
 
       {detailTask ? (
         <TaskDetail

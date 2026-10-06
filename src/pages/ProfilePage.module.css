@@ -1,0 +1,93 @@
+.page {
+  padding: var(--space-5) var(--space-4);
+  padding-bottom: 120px;
+}
+
+.content {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.profileHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-8) 0 var(--space-6);
+  text-align: center;
+}
+
+.displayName {
+  font-size: 22px;
+  font-weight: 700;
+  margin: var(--space-1) 0 0;
+}
+
+.email {
+  font-size: 14px;
+  color: var(--color-text-2);
+  margin: 0;
+}
+
+.section {
+  margin-bottom: var(--space-5);
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  margin: 0 0 var(--space-2) var(--space-1);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.staticRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) 0;
+  gap: var(--space-4);
+}
+
+.rowLabel {
+  font-size: 14px;
+  color: var(--color-text-2);
+  flex-shrink: 0;
+}
+
+.rowValue {
+  font-size: 14px;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.themeControl {
+  width: 100%;
+  justify-content: stretch;
+}
+
+.themeControl button {
+  flex: 1;
+  justify-content: center;
+}
+
+.fieldError {
+  font-size: 13px;
+  color: var(--color-danger);
+  margin: 0;
+}

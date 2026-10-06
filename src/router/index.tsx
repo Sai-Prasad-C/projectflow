@@ -10,6 +10,8 @@ import WorkspaceRedirectPage from '../pages/WorkspaceRedirectPage'
 import ProjectListPage from '../pages/ProjectListPage'
 import ProjectDashboardPage from '../pages/ProjectDashboardPage'
 import KanbanPage from '../pages/KanbanPage'
+import InsightsPage from '../pages/InsightsPage'
+import ProfilePage from '../pages/ProfilePage'
 
 export const router = createBrowserRouter([
   { path: '/',                element: <RootRedirect /> },
@@ -26,9 +28,11 @@ export const router = createBrowserRouter([
         path: ':workspaceId',
         element: <WorkspaceLayout />,
         children: [
-          { path: 'projects', element: <ProjectListPage /> },
-          { path: 'projects/:projectId', element: <ProjectDashboardPage /> },
-          { path: 'projects/:projectId/board', element: <KanbanPage /> },
+          { path: 'projects',                    element: <ProjectListPage /> },
+          { path: 'projects/:projectId',         element: <ProjectDashboardPage /> },
+          { path: 'projects/:projectId/board',   element: <KanbanPage /> },
+          { path: 'insights',                    element: <InsightsPage /> },
+          { path: 'profile',                     element: <ProfilePage /> },
         ],
       },
     ],
