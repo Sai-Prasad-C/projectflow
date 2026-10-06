@@ -9,6 +9,7 @@ import { clearUserData } from '../lib/idb'
 import type { Workspace, WorkspaceRole } from '../lib/types'
 import BottomSheet from '../components/ui/BottomSheet'
 import MemberList from '../components/workspace/MemberList'
+import WorkspaceSwitcher from '../components/workspace/WorkspaceSwitcher'
 import SyncIndicator from '../components/ui/SyncIndicator'
 import GlobalCreateSheet from '../components/create/GlobalCreateSheet'
 import styles from './WorkspaceLayout.module.css'
@@ -63,6 +64,7 @@ export default function WorkspaceLayout() {
 
   async function handleSignOut() {
     await clearUserData()
+    localStorage.removeItem('pf-last-workspace')
     await supabase.auth.signOut()
     navigate('/login', { replace: true })
   }
@@ -115,7 +117,9 @@ export default function WorkspaceLayout() {
               <FolderKanban size={18} aria-hidden="true" />
               ProjectFlow
             </Link>
-            <div className={styles.workspaceName}>{state.workspace.name}</div>
+            <div className={styles.workspaceSwitcherWrap}>
+              <WorkspaceSwitcher currentWorkspace={state.workspace} />
+            </div>
           </div>
 
           <nav className={styles.sidebarNav} aria-label="Main navigation">
@@ -155,7 +159,7 @@ export default function WorkspaceLayout() {
             <FolderKanban size={18} aria-hidden="true" />
             ProjectFlow
           </Link>
-          <span className={styles.topBarWorkspace}>{state.workspace.name}</span>
+          <WorkspaceSwitcher currentWorkspace={state.workspace} />
           <button
             type="button"
             className={styles.topBarIcon}

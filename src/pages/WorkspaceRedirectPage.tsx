@@ -24,7 +24,9 @@ export default function WorkspaceRedirectPage() {
   }
 
   if (workspaces.length > 0) {
-    return <Navigate to={`/app/${workspaces[0].id}/projects`} replace />
+    const lastId = localStorage.getItem('pf-last-workspace')
+    const target = workspaces.find(w => w.id === lastId) ?? workspaces[0]
+    return <Navigate to={`/app/${target.id}/projects`} replace />
   }
 
   async function handleSignOut() {

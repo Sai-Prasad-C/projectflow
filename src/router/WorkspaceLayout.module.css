@@ -42,13 +42,9 @@
   text-decoration: none;
 }
 
-.workspaceName {
-  font-size: 12px;
-  color: var(--sidebar-text-3);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding-left: 26px;
+.workspaceSwitcherWrap {
+  margin-top: var(--space-3);
+  position: relative;
 }
 
 .sidebarNav {
@@ -153,14 +149,7 @@
   display: none;
 }
 
-.topBarWorkspace {
-  flex: 1;
-  font-size: 13px;
-  color: var(--color-text-2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+/* .topBarWorkspace removed — replaced by WorkspaceSwitcher */
 
 .topBarIcon {
   background: none;

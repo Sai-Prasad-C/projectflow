@@ -1,0 +1,213 @@
+/* ── Trigger button ─────────────────────────────── */
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  background: rgba(255 255 255 / 0.05);
+  border: 1px solid rgba(255 255 255 / 0.08);
+  border-radius: var(--radius-md);
+  padding: 7px var(--space-3);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--transition), border-color var(--transition);
+  min-height: 36px;
+}
+
+.trigger:hover {
+  background: rgba(255 255 255 / 0.1);
+  border-color: rgba(255 255 255 / 0.14);
+}
+
+.triggerName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  text-align: left;
+}
+
+.chevron {
+  color: var(--sidebar-text-3);
+  flex-shrink: 0;
+  transition: transform var(--transition);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Mobile top bar — override colors to match light surface */
+@media (max-width: 768px) {
+  .trigger {
+    background: var(--color-surface-2);
+    border-color: var(--color-border);
+    flex: 1;
+    min-width: 0;
+    max-width: 200px;
+  }
+
+  .trigger:hover {
+    background: var(--color-surface-2);
+    border-color: var(--color-text-3);
+  }
+
+  .triggerName {
+    color: var(--color-text);
+    font-size: 13px;
+  }
+
+  .chevron {
+    color: var(--color-text-3);
+  }
+}
+
+/* ── Desktop popover ─────────────────────────────── */
+.popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: var(--space-2);
+  right: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  overflow: hidden;
+  min-width: 200px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.popoverHeader {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-3);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+}
+
+/* ── Workspace rows (shared desktop + mobile) ─────── */
+.wsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background var(--transition);
+  min-height: 44px;
+}
+
+.wsRow:hover {
+  background: var(--color-surface-2);
+}
+
+.wsRowActive {
+  background: var(--color-primary-subtle);
+}
+
+.wsRowActive:hover {
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+}
+
+.wsCheck {
+  width: 18px;
+  flex-shrink: 0;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wsName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.separator {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-1) 0;
+}
+
+.createRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-primary);
+  text-align: left;
+  transition: background var(--transition);
+  min-height: 44px;
+}
+
+.createRow:hover {
+  background: var(--color-primary-subtle);
+}
+
+.createIcon {
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.loadingRow {
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  color: var(--color-text-3);
+}
+
+/* ── Mobile bottom sheet ─────────────────────────── */
+.sheetTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 var(--space-3);
+  color: var(--color-text);
+}
+
+.sheetList {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.sheetList .wsRow,
+.sheetList .createRow {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sheetList .wsRow:last-of-type,
+.sheetList .createRow:last-child {
+  border-bottom: none;
+}
+
+.sheetList .separator {
+  margin: 0;
+}

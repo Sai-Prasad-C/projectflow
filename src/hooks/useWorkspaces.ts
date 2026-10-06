@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Workspace } from '../lib/types'
 
@@ -6,6 +6,7 @@ export function useWorkspaces() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [rev, setRev] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -21,7 +22,9 @@ export function useWorkspaces() {
     }
     void load()
     return () => { cancelled = true }
-  }, [])
+  }, [rev])
 
-  return { workspaces, loading, error }
+  const reload = useCallback(() => setRev(r => r + 1), [])
+
+  return { workspaces, loading, error, reload }
 }
