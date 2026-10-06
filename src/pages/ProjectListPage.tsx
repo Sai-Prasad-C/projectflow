@@ -43,7 +43,7 @@ export default function ProjectListPage() {
     const { data, error } = await supabase
       .from('projects')
       .insert({
-        workspace_id: workspaceId,
+        workspace_id: workspaceId!,
         name,
         description: description || null,
         created_by: userData.user.id,

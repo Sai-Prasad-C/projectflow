@@ -54,3 +54,12 @@ export interface MemberProfile {
   display_name: string
   avatar_url: string | null
 }
+
+export interface TaskComment {
+  id: string
+  task_id: string
+  author_id: string
+  body: string
+  created_at: string
+  updated_at: string
+}

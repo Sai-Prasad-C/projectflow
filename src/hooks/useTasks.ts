@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { getCachedTasks, putTasks, putTask, removeTask } from '../lib/idb'
 import type { Task } from '../lib/types'
 
 export function useTasks(projectId: string) {
@@ -10,6 +11,11 @@ export function useTasks(projectId: string) {
   useEffect(() => {
     if (!projectId) return
     let cancelled = false
+
+    // Immediately render cached tasks so the board is visible while fetching.
+    getCachedTasks(projectId).then(cached => {
+      if (!cancelled && cached.length > 0) setTasks(cached as Task[])
+    }).catch(() => { /* IDB unavailable — silently ignore */ })
 
     // Subscribe before fetching so no events are missed during the initial load.
     // The fetch result is set as canonical state once it returns; events that fire
@@ -27,6 +33,7 @@ export function useTasks(projectId: string) {
         },
         (payload) => {
           const t = payload.new as Task
+          void putTask(t as Task & { version?: number })
           // Skip if we already have this row — covers local adds that are
           // appended to state after the DB write returns (before Realtime fires).
           setTasks(prev => prev.some(x => x.id === t.id) ? prev : [...prev, t])
@@ -42,6 +49,7 @@ export function useTasks(projectId: string) {
         },
         (payload) => {
           const t = payload.new as Task
+          void putTask(t as Task & { version?: number })
           setTasks(prev => prev.map(x => x.id === t.id ? t : x))
         }
       )
@@ -55,6 +63,7 @@ export function useTasks(projectId: string) {
         },
         (payload) => {
           const id = (payload.old as { id: string }).id
+          void removeTask(id)
           setTasks(prev => prev.filter(x => x.id !== id))
         }
       )
@@ -70,8 +79,10 @@ export function useTasks(projectId: string) {
         .order('position', { ascending: true })
       if (cancelled) return
       if (fetchError) { setError(fetchError.message); setLoading(false); return }
-      setTasks((data ?? []) as Task[])
+      const fetched = (data ?? []) as Task[]
+      setTasks(fetched)
       setLoading(false)
+      void putTasks(fetched as (Task & { version?: number })[])
     }
 
     void load()

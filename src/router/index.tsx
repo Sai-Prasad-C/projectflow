@@ -12,6 +12,7 @@ import ProjectDashboardPage from '../pages/ProjectDashboardPage'
 import KanbanPage from '../pages/KanbanPage'
 import InsightsPage from '../pages/InsightsPage'
 import ProfilePage from '../pages/ProfilePage'
+import InvitePage from '../pages/InvitePage'
 
 export const router = createBrowserRouter([
   { path: '/',                element: <RootRedirect /> },
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
   { path: '/register',        element: <RegisterPage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },
   { path: '/reset-password',  element: <ResetPasswordPage /> },
+  { path: '/invite/:token',   element: <InvitePage /> },
   {
     path: '/app',
     element: <ProtectedRoute />,

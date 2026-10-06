@@ -5,9 +5,11 @@ import { WorkspaceContext } from '../context/workspace-context'
 import type { WorkspaceContextValue } from '../context/workspace-context'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
+import { clearUserData } from '../lib/idb'
 import type { Workspace, WorkspaceRole } from '../lib/types'
 import BottomSheet from '../components/ui/BottomSheet'
 import MemberList from '../components/workspace/MemberList'
+import SyncIndicator from '../components/ui/SyncIndicator'
 import styles from './WorkspaceLayout.module.css'
 
 type LoadState =
@@ -58,6 +60,7 @@ export default function WorkspaceLayout() {
   }, [workspaceId])
 
   async function handleSignOut() {
+    await clearUserData()
     await supabase.auth.signOut()
     navigate('/login', { replace: true })
   }
@@ -101,6 +104,7 @@ export default function WorkspaceLayout() {
   return (
     <WorkspaceContext.Provider value={ctx}>
       <div className={styles.layout}>
+        <SyncIndicator />
 
         {/* ── Desktop sidebar ──────────────────────────────────── */}
         <aside className={styles.sidebar}>
