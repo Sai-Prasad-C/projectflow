@@ -1,0 +1,18 @@
+.board {
+  display: flex;
+  gap: var(--space-4);
+  align-items: stretch;
+  overflow-x: auto;
+  padding-bottom: var(--space-4);
+  min-height: calc(100svh - 240px);
+}
+
+/* Ensure scroll region has some bottom breathing room */
+.board::-webkit-scrollbar {
+  height: 6px;
+}
+
+.board::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}

@@ -1,0 +1,159 @@
+.card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  cursor: pointer;
+  transition: box-shadow var(--transition), opacity var(--transition);
+  user-select: none;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card.dragging {
+  opacity: 0.4;
+}
+
+/* Drop-line indicators shown when a drag is active */
+.card.dropAbove::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+.card.dropBelow::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+  word-break: break-word;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.priorityDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priorityDot[data-priority="low"]    { background: var(--color-priority-low); }
+.priorityDot[data-priority="medium"] { background: var(--color-priority-medium); }
+.priorityDot[data-priority="high"]   { background: var(--color-priority-high); }
+.priorityDot[data-priority="urgent"] { background: var(--color-priority-urgent); }
+
+.chip {
+  font-size: 11px;
+  color: var(--color-text-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
+.chip.overdue {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+.avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+  font-size: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-2);
+}
+
+.statusSelect {
+  flex: 1;
+  font-size: 11px;
+  padding: 2px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  color: var(--color-text-2);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.statusSelect:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+}
+
+.iconBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-3);
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  line-height: 1;
+  transition: color var(--transition), background var(--transition);
+}
+
+.iconBtn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-2);
+}
+
+.iconBtn.deleteBtn:hover {
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+/* On pointer-capable devices hide the delete button until the card is hovered */
+@media (hover: hover) {
+  .deleteBtn {
+    opacity: 0;
+    transition: opacity var(--transition), color var(--transition), background var(--transition);
+  }
+
+  .card:hover .deleteBtn,
+  .card:focus-within .deleteBtn {
+    opacity: 1;
+  }
+}

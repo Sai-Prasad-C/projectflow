@@ -1,0 +1,87 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  min-width: 260px;
+  width: 260px;
+  flex-shrink: 0;
+  gap: var(--space-2);
+  /* Cap height so cards scroll independently inside the column */
+  max-height: calc(100svh - 200px);
+}
+
+.column.dragOver {
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface-2));
+  outline: 2px dashed color-mix(in srgb, var(--color-primary) 40%, transparent);
+  outline-offset: -2px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-1) var(--space-1) var(--space-2);
+}
+
+.statusLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.count {
+  font-size: 12px;
+  color: var(--color-text-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  min-height: 60px;
+  /* Scrolls independently when the column reaches max-height */
+  overflow-y: auto;
+  /* Thin scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.emptyDrop {
+  flex: 1;
+  min-height: 60px;
+  border-radius: var(--radius-md);
+  transition: background var(--transition);
+}
+
+.emptyDrop.active {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  outline: 2px dashed var(--color-primary);
+  outline-offset: -2px;
+}
+
+.addBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  width: 100%;
+  text-align: left;
+  transition: color var(--transition), background var(--transition);
+  font-family: inherit;
+}
+
+.addBtn:hover {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
