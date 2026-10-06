@@ -4,6 +4,8 @@ import { ArrowLeft, Settings, Users, Plus } from 'lucide-react'
 import KanbanBoard from '../components/kanban/KanbanBoard'
 import TaskDetail from '../components/kanban/TaskDetail'
 import TaskForm from '../components/kanban/TaskForm'
+import TaskListView from '../components/kanban/TaskListView'
+import ProjectActivityView from '../components/kanban/ProjectActivityView'
 import ProjectForm from '../components/project/ProjectForm'
 import type { TaskFormValues } from '../components/kanban/TaskForm'
 import { useAuth } from '../hooks/useAuth'
@@ -15,6 +17,8 @@ import type { Project, Task, TaskStatus } from '../lib/types'
 import BottomSheet from '../components/ui/BottomSheet'
 import MemberList from '../components/workspace/MemberList'
 import styles from './KanbanPage.module.css'
+
+type Tab = 'board' | 'list' | 'activity'
 
 type EditModal =
   | { mode: 'create'; defaultStatus: TaskStatus }
@@ -33,6 +37,7 @@ export default function KanbanPage() {
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null)
   const [editModal, setEditModal] = useState<EditModal>(null)
   const [moveError, setMoveError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<Tab>('board')
   const [showMembers, setShowMembers] = useState(false)
   const [showProjectEdit, setShowProjectEdit] = useState(false)
 
@@ -288,34 +293,58 @@ export default function KanbanPage() {
 
       {/* ── Tab nav ────────────────────────────────────────── */}
       <div className={styles.tabs} role="tablist">
-        <button type="button" className={`${styles.tab} ${styles.tabActive}`} role="tab" aria-selected="true">
-          Board
-        </button>
-        <button type="button" className={styles.tab} role="tab" aria-selected="false" disabled>
-          List
-        </button>
-        <button type="button" className={styles.tab} role="tab" aria-selected="false" disabled>
-          Activity
-        </button>
+        {(['board', 'list', 'activity'] as Tab[]).map(tab => (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab}
+            className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
       </div>
 
       {loadError ? <p className={styles.error}>{loadError}</p> : null}
       {moveError ? <p className={styles.error}>{moveError}</p> : null}
 
       {/* ── Board ──────────────────────────────────────────── */}
-      <div className={styles.boardWrap}>
-        <KanbanBoard
-          tasks={tasks}
-          members={members}
-          draggingTaskId={draggingTaskId}
-          onDragStart={setDraggingTaskId}
-          onDragEnd={() => setDraggingTaskId(null)}
-          onMoveTask={handleMoveTask}
-          onAddTask={status => setEditModal({ mode: 'create', defaultStatus: status })}
-          onEditTask={task => setDetailTaskId(task.id)}
-          onDeleteTask={handleDeleteTask}
-        />
-      </div>
+      {activeTab === 'board' && (
+        <div className={styles.boardWrap}>
+          <KanbanBoard
+            tasks={tasks}
+            members={members}
+            draggingTaskId={draggingTaskId}
+            onDragStart={setDraggingTaskId}
+            onDragEnd={() => setDraggingTaskId(null)}
+            onMoveTask={handleMoveTask}
+            onAddTask={status => setEditModal({ mode: 'create', defaultStatus: status })}
+            onEditTask={task => setDetailTaskId(task.id)}
+            onDeleteTask={handleDeleteTask}
+          />
+        </div>
+      )}
+
+      {/* ── List ───────────────────────────────────────────── */}
+      {activeTab === 'list' && (
+        <div className={styles.listWrap}>
+          <TaskListView
+            tasks={tasks}
+            members={members}
+            onTaskClick={task => setDetailTaskId(task.id)}
+            onAddTask={() => setEditModal({ mode: 'create', defaultStatus: 'todo' })}
+          />
+        </div>
+      )}
+
+      {/* ── Activity ───────────────────────────────────────── */}
+      {activeTab === 'activity' && (
+        <div className={styles.activityWrap}>
+          <ProjectActivityView tasks={tasks} members={members} />
+        </div>
+      )}
 
       {detailTask ? (
         <TaskDetail

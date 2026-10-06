@@ -48,7 +48,7 @@ src/
 │   ├── auth/                    # LoginForm, RegisterForm, ResetPasswordForm
 │   ├── workspace/               # WorkspaceSwitcher, MemberList, WorkspaceForm
 │   ├── project/                 # ProjectCard, ProjectForm, ProjectDashboard
-│   ├── kanban/                  # KanbanBoard, KanbanColumn, TaskCard, TaskForm, TaskDetail
+│   ├── kanban/                  # KanbanBoard, KanbanColumn, TaskCard, TaskForm, TaskDetail, TaskListView, ProjectActivityView
 │   └── comment/                 # CommentList, CommentForm
 ├── pages/
 │   ├── LoginPage.tsx
@@ -160,12 +160,21 @@ Use a helper SQL function `is_workspace_member(workspace_id uuid)` in policies t
 7. **XSS prevention.** Task descriptions and comments are plain text. No `dangerouslySetInnerHTML`. No markdown renderer in MVP.
 8. **Small, focused components.** Prefer splitting over abstraction. No premature generics.
 
+## Account identity — non-negotiable
+
+- **Supabase Auth user UUID is the stable user identity.**
+- **Email is editable account metadata** and must never be used as the primary foreign key for workspace membership, task assignment, ownership, or authorization.
+- **Account/security changes such as email changes are online-only** and are never queued through offline sync.
+- Email change uses `supabase.auth.updateUser({ email: newEmail })` — confirmation-based, not immediate. Use `${window.location.origin}` as the redirect origin (no hardcoded localhost or production URL in source).
+- Workspace membership, task assignment, and ownership all remain tied to UUID; they are unaffected by email changes.
+
 ## Security rules
 
 - Workspace slugs: validate as `/^[a-z0-9-]+$/` before write; reject path traversal characters.
 - Role escalation: RLS policies must verify `workspace_members.role` server-side — a user cannot promote themselves.
 - Realtime channels: subscribe only to rows the user is authorised to see; filter by `workspace_id` or `project_id`.
 - No Edge Functions with service-role key in MVP.
+- Never use service-role credentials in `src/` for account operations; `supabase.auth.updateUser` with the user's own JWT is sufficient.
 
 ## Implementation phases
 
@@ -180,6 +189,35 @@ Use a helper SQL function `is_workspace_member(workspace_id uuid)` in policies t
 | 6 — Kanban | Board columns, task CRUD, task detail drawer |
 | 7 — Comments + Realtime | Comment thread, Supabase Realtime on tasks and comments |
 | 8 — Profile + PWA | Profile page, PWA manifest / icons, mobile audit |
+| 9 — Project tabs | List and Activity tabs on the project board page |
+
+## Project board tabs (KanbanPage)
+
+Three tabs on `KanbanPage`: **Board**, **List**, **Activity**. All share the same `tasks` state from `useTasks` — no additional Supabase queries.
+
+### Board
+Existing Kanban board. Unchanged.
+
+### List (`TaskListView`)
+- Alternative flat view of all project tasks.
+- Desktop: 5-column CSS grid — title / status / priority / assignee / due date.
+- Mobile: stacked rows — title, then a flex meta row (status chip, priority dot + label, assignee avatar + name, due date).
+- Default sort: incomplete tasks first → by due date (nulls last) → by position.
+- Clicking a row opens the existing TaskDetail drawer (`setDetailTaskId`). No second editor.
+- Empty state uses `EmptyState` component with an "Add task" button.
+
+### Activity (`ProjectActivityView`)
+- Lightweight timeline derived purely from existing task fields — no audit table, no DB triggers.
+- Each task produces one entry: if `updated_at − created_at > 10 s` → "Task updated" at `updated_at`; otherwise → "Task created" at `created_at`.
+- Sorted newest first, grouped into Today / Yesterday / older date labels.
+- Wording is conservative — only states "created" or "updated", never "status changed" / "reassigned" / etc.
+- Desktop: constrained to `max-width: 680px`. Mobile: full width, titles wrap.
+- Empty state: "No activity yet."
+
+### Do not add
+- Audit/activity database table or triggers.
+- Additional Realtime subscriptions.
+- Filtering, grouping, saved views, CSV export, bulk editing, drag-and-drop in List.
 
 ## Linting notes
 
@@ -314,8 +352,9 @@ supabase gen types typescript --linked > src/lib/database.types.ts
 5. Call `syncManager.sync()` — processes if online, queues if offline
 
 ### Security constraint
-- Login, registration, password reset, workspace membership admin, invitation creation/acceptance — **remain online-only**.
+- Login, registration, password reset, email changes, workspace membership admin, invitation creation/acceptance — **remain online-only**.
 - Do NOT pretend security-sensitive remote operations succeeded while offline.
+- Email change: show an error if offline. Do NOT queue in outbox.
 
 ### Hooks pattern
 Hooks read IDB first (fast), then hydrate from network. Realtime events also write through to IDB.
@@ -333,8 +372,10 @@ Hooks read IDB first (fast), then hydrate from network. Realtime events also wri
 - `accept_workspace_invitation(p_token)` — hashes token, validates expiry/revoke/email match, atomically adds membership, marks accepted. Idempotent.
 
 ### Edge Function
-- `send-workspace-invite`: JWT-verified POST; calls the RPC to create invite; optionally delivers email via `EMAIL_PROVIDER_API_KEY` (Resend API format). Email failure does NOT corrupt invitation state.
-- Configuration: `APP_URL`, `EMAIL_PROVIDER_API_KEY`, `INVITE_FROM_EMAIL` — set via `supabase secrets set`.
+- `send-workspace-invite`: JWT-verified POST; calls the RPC to create invite; returns `{ inviteUrl, emailSent: false, sharingMode: "link" }`. No email provider dependency.
+- Only required secret: `APP_URL` (production: `https://projectflow-41w.pages.dev`). Set via `supabase secrets set APP_URL=https://projectflow-41w.pages.dev`.
+- Token is NOT returned in the Edge Function response — it exists only in the invite URL.
+- Deploy without Docker: `supabase functions deploy send-workspace-invite`.
 
 ### Frontend flow
 - Owner/admin sees invite form in MemberList sheet.

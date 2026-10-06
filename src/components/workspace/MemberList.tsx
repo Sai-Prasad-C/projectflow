@@ -8,7 +8,6 @@ import { supabase } from '../../lib/supabase'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
-import Input from '../ui/Input'
 import styles from './MemberList.module.css'
 
 interface Props {
@@ -193,15 +192,14 @@ export default function MemberList({ workspaceId, onClose }: Props) {
           <div className={styles.section}>
             <h3 className={styles.sectionLabel}>Invite someone</h3>
             <div className={styles.inviteRow}>
-              <div className={styles.inviteInputWrap}>
-                <Input
-                  label=""
-                  placeholder="email@example.com"
-                  type="email"
-                  value={inviteEmail}
-                  onChange={e => setInviteEmail(e.target.value)}
-                />
-              </div>
+              <input
+                className={styles.emailInput}
+                placeholder="email@example.com"
+                type="email"
+                value={inviteEmail}
+                onChange={e => setInviteEmail(e.target.value)}
+                aria-label="Invitee email address"
+              />
               <select
                 className={styles.roleSelect}
                 value={inviteRole}

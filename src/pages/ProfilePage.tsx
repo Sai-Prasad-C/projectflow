@@ -8,6 +8,7 @@ import SegmentedControl from '../components/ui/SegmentedControl'
 import Avatar from '../components/ui/Avatar'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
+import ChangeEmailSheet from '../components/profile/ChangeEmailSheet'
 import styles from './ProfilePage.module.css'
 
 type ThemeMode = 'light' | 'dark' | 'system'
@@ -28,6 +29,7 @@ export default function ProfilePage() {
   const [editName, setEditName] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [showEmailSheet, setShowEmailSheet] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -109,6 +111,10 @@ export default function ProfilePage() {
               <span className={styles.rowLabel}>Email</span>
               <span className={styles.rowValue}>{user?.email}</span>
             </div>
+            <div className={styles.divider} />
+            <Button variant="ghost" onClick={() => setShowEmailSheet(true)}>
+              Change email
+            </Button>
           </div>
         </section>
 
@@ -131,6 +137,13 @@ export default function ProfilePage() {
         </section>
 
       </div>
+
+      {showEmailSheet && user?.email && (
+        <ChangeEmailSheet
+          currentEmail={user.email}
+          onClose={() => setShowEmailSheet(false)}
+        />
+      )}
     </div>
   )
 }

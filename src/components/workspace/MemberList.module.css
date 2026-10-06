@@ -30,11 +30,11 @@
   cursor: pointer;
   color: var(--color-text-3);
   padding: var(--space-1);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   transition: color var(--transition), background var(--transition);
   flex-shrink: 0;
-  min-width: 32px;
-  min-height: 32px;
+  width: 32px;
+  height: 32px;
 }
 
 .closeBtn:hover {
@@ -136,31 +136,52 @@
 .inviteRow {
   display: flex;
   gap: var(--space-2);
-  align-items: flex-end;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
-.inviteInputWrap {
+.emailInput {
   flex: 1;
-  min-width: 160px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 13px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.5;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+
+.emailInput::placeholder {
+  color: var(--color-text-3);
+}
+
+.emailInput:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
 
 .roleSelect {
   height: 40px;
   padding: 0 var(--space-3);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 13px;
+  font-size: 14px;
   font-family: var(--font-sans);
   cursor: pointer;
   flex-shrink: 0;
+  transition: border-color var(--transition);
 }
 
 .roleSelect:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
 
 .error {

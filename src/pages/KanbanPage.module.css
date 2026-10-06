@@ -236,6 +236,15 @@
   border-radius: 2px;
 }
 
+/* ── List / Activity wraps ───────────────────────── */
+.listWrap {
+  min-height: calc(100dvh - 340px);
+}
+
+.activityWrap {
+  min-height: calc(100dvh - 340px);
+}
+
 /* ── Errors / loading ────────────────────────────── */
 .error {
   font-size: 13px;
@@ -275,6 +284,11 @@
     padding: 0;
     min-height: calc(100dvh - 380px);
     overflow-x: auto;
+  }
+
+  .listWrap,
+  .activityWrap {
+    min-height: calc(100dvh - 380px);
   }
 
   .tabs {

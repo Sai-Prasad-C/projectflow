@@ -86,6 +86,12 @@
   justify-content: center;
 }
 
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 0 calc(-1 * var(--space-4));
+}
+
 .fieldError {
   font-size: 13px;
   color: var(--color-danger);

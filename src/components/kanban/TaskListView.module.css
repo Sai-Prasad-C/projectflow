@@ -1,0 +1,201 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+/* ── Desktop column header ─────────────────────── */
+.headerRow {
+  display: grid;
+  grid-template-columns: 1fr 110px 100px 140px 90px;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+
+.headerRow span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-3);
+}
+
+/* ── Task row ──────────────────────────────────── */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 110px 100px 140px 90px;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+  transition: background var(--transition);
+  min-height: 48px;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background: var(--color-surface-2);
+}
+
+.rowDone .title {
+  text-decoration: line-through;
+  color: var(--color-text-3);
+}
+
+/* ── Columns ───────────────────────────────────── */
+.title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.backlog    { background: var(--color-surface-2); color: var(--color-text-3); }
+.todo       { background: color-mix(in srgb, var(--color-warning) 15%, transparent); color: var(--color-warning); }
+.in_progress { background: color-mix(in srgb, var(--color-primary) 15%, transparent); color: var(--color-primary); }
+.done       { background: color-mix(in srgb, var(--color-success) 15%, transparent); color: var(--color-success); }
+
+.priority {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.priorityDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priorityDot[data-priority='low']    { background: var(--color-success); }
+.priorityDot[data-priority='medium'] { background: var(--color-warning); }
+.priorityDot[data-priority='high']   { background: #f97316; }
+.priorityDot[data-priority='urgent'] { background: var(--color-danger); }
+
+.priorityLabel {
+  font-size: 13px;
+  color: var(--color-text-2);
+}
+
+.assignee {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.assigneeName {
+  font-size: 13px;
+  color: var(--color-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unassigned {
+  font-size: 13px;
+  color: var(--color-text-3);
+}
+
+.due {
+  font-size: 13px;
+  color: var(--color-text-2);
+  white-space: nowrap;
+}
+
+.due.overdue {
+  color: var(--color-danger);
+}
+
+.noDue {
+  color: var(--color-text-3);
+}
+
+/* On desktop, .meta is transparent to the grid */
+.meta {
+  display: contents;
+}
+
+/* ── Mobile ──────────────────────────────────────
+   Collapse the grid; show stacked card layout     */
+@media (max-width: 767px) {
+  .headerRow {
+    display: none;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    min-height: auto;
+  }
+
+  .title {
+    white-space: normal;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* meta becomes a flex row of metadata chips */
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .status {
+    font-size: 11px;
+    padding: 2px 7px;
+  }
+
+  .priority {
+    gap: 4px;
+  }
+
+  .priorityLabel {
+    font-size: 12px;
+  }
+
+  .assignee {
+    gap: var(--space-1);
+  }
+
+  .assigneeName {
+    font-size: 12px;
+  }
+
+  .due {
+    font-size: 12px;
+    margin-left: auto;
+  }
+}

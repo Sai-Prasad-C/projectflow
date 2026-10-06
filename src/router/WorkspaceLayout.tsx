@@ -10,6 +10,7 @@ import type { Workspace, WorkspaceRole } from '../lib/types'
 import BottomSheet from '../components/ui/BottomSheet'
 import MemberList from '../components/workspace/MemberList'
 import SyncIndicator from '../components/ui/SyncIndicator'
+import GlobalCreateSheet from '../components/create/GlobalCreateSheet'
 import styles from './WorkspaceLayout.module.css'
 
 type LoadState =
@@ -24,6 +25,7 @@ export default function WorkspaceLayout() {
   const { user } = useAuth()
   const [state, setState] = useState<LoadState>({ status: 'loading' })
   const [showMembers, setShowMembers] = useState(false)
+  const [showCreate, setShowCreate] = useState(false)
 
   useEffect(() => {
     if (!workspaceId) {
@@ -182,9 +184,14 @@ export default function WorkspaceLayout() {
               <span className={styles.pillLabel}>Insights</span>
             </NavLink>
 
-            <Link to={projectsHref} className={styles.fab} aria-label="Go to projects">
-              <Plus size={22} strokeWidth={2.5} />
-            </Link>
+            <button
+              type="button"
+              className={styles.fab}
+              aria-label="Create"
+              onClick={() => setShowCreate(true)}
+            >
+              <Plus size={20} strokeWidth={2.5} aria-hidden="true" />
+            </button>
 
             <NavLink to={profileHref} className={pillClass}>
               <User size={20} aria-hidden="true" />
@@ -198,6 +205,14 @@ export default function WorkspaceLayout() {
           <BottomSheet onClose={() => setShowMembers(false)} aria-labelledby="members-title">
             <MemberList workspaceId={state.workspace.id} onClose={() => setShowMembers(false)} />
           </BottomSheet>
+        ) : null}
+
+        {/* ── Global create sheet ───────────────────────────────── */}
+        {showCreate ? (
+          <GlobalCreateSheet
+            workspaceId={state.workspace.id}
+            onClose={() => setShowCreate(false)}
+          />
         ) : null}
 
       </div>
