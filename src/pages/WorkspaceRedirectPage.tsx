@@ -63,6 +63,7 @@ export default function WorkspaceRedirectPage() {
     const { data: workspaceId, error } = await supabase.rpc('create_workspace', { p_name: trimmed })
     setCreating(false)
     if (error) { setError(error.message); return }
+    localStorage.setItem('pf-last-workspace', workspaceId as string)
     navigate(`/app/${workspaceId as string}/projects`, { replace: true })
   }
 

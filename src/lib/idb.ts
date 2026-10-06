@@ -137,6 +137,17 @@ export async function getPendingOutbox(): Promise<OutboxEntry[]> {
   return db.getAllFromIndex('outbox', 'by-status', 'pending')
 }
 
+// Recover entries left in 'syncing' state by a previous crash.
+// Called once on SyncManager startup before the first sync pass.
+export async function recoverStuckSyncingEntries(): Promise<void> {
+  const db = await getDB()
+  const stuck = await db.getAllFromIndex('outbox', 'by-status', 'syncing')
+  if (stuck.length === 0) return
+  const tx = db.transaction('outbox', 'readwrite')
+  await Promise.all(stuck.map(e => tx.store.put({ ...e, status: 'pending' })))
+  await tx.done
+}
+
 export async function updateOutboxEntry(entry: OutboxEntry): Promise<void> {
   const db = await getDB()
   await db.put('outbox', entry)

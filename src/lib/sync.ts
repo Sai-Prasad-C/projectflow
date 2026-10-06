@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import {
-  getPendingOutbox, updateOutboxEntry, removeOutboxEntry,
+  getPendingOutbox, recoverStuckSyncingEntries, updateOutboxEntry, removeOutboxEntry,
   putTask, removeTask, putComment, removeComment, putConflict,
 } from './idb'
 import type { OutboxEntry, ConflictEntry } from './idb'
@@ -36,6 +36,8 @@ class SyncManager {
     this.emit()
 
     try {
+      // Recover any entries stuck in 'syncing' from a previous crash before processing.
+      await recoverStuckSyncingEntries()
       const entries = await getPendingOutbox()
       this._pending = entries.length
 
