@@ -62,7 +62,7 @@ export default function WorkspaceLayout() {
     }
     void load()
     return () => { cancelled = true }
-  }, [workspaceId])
+  }, [workspaceId, user?.id])
 
   async function handleSignOut() {
     await clearUserData()

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -7,10 +7,12 @@ import Brand from '../components/ui/Brand'
 import Button from '../components/ui/Button'
 import styles from './InvitePage.module.css'
 
+const PENDING_INVITE_KEY = 'pf-pending-invite'
+
 type PageState =
   | { status: 'loading' }
   | { status: 'accepting' }
-  | { status: 'success'; workspaceId: string }
+  | { status: 'success'; workspaceId: string; workspaceName: string }
   | { status: 'already_accepted' }
   | { status: 'expired' }
   | { status: 'revoked' }
@@ -21,53 +23,57 @@ type PageState =
 export default function InvitePage() {
   const { token } = useParams<{ token: string }>()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [state, setState] = useState<PageState>({ status: 'loading' })
+  // Guard against double-accept in React Strict Mode; server RPC is also idempotent.
+  const acceptingRef = useRef(false)
 
   useEffect(() => {
-    if (!token) {
-      setState({ status: 'invalid' })
-      return
-    }
+    if (!token) { setState({ status: 'invalid' }); return }
+    // Wait for auth state to resolve — avoids storing sessionStorage token
+    // or calling acceptInvite prematurely while the session is still loading.
+    if (authLoading) return
 
     if (!user) {
-      // Preserve token in sessionStorage and redirect to login
-      sessionStorage.setItem('pf-pending-invite', token)
+      sessionStorage.setItem(PENDING_INVITE_KEY, token)
       navigate('/login', { replace: true })
       return
     }
 
-    // Check for a stored invite token after login redirect
-    const stored = sessionStorage.getItem('pf-pending-invite')
-    if (stored) sessionStorage.removeItem('pf-pending-invite')
-
-    acceptInvite(token)
-  }, [token, user]) // eslint-disable-line react-hooks/exhaustive-deps
+    void acceptInvite(token)
+  }, [token, user, authLoading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function acceptInvite(t: string) {
+    if (acceptingRef.current) return
+    acceptingRef.current = true
     setState({ status: 'accepting' })
+
     const { data, error } = await supabase.rpc('accept_workspace_invitation', { p_token: t })
 
     if (error) {
+      acceptingRef.current = false
       const msg = error.message.toLowerCase()
-      if (msg.includes('expired'))        return setState({ status: 'expired' })
-      if (msg.includes('revoked'))        return setState({ status: 'revoked' })
+      if (msg.includes('expired'))          return setState({ status: 'expired' })
+      if (msg.includes('revoked'))          return setState({ status: 'revoked' })
       if (msg.includes('already accepted')) return setState({ status: 'already_accepted' })
       if (msg.includes('different email')) {
         return setState({ status: 'wrong_account', inviteEmail: '(check your other account)' })
       }
-      if (msg.includes('invalid'))        return setState({ status: 'invalid' })
+      if (msg.includes('invalid'))          return setState({ status: 'invalid' })
       return setState({ status: 'error', message: error.message })
     }
 
-    if (!data) return setState({ status: 'invalid' })
-    setState({ status: 'success', workspaceId: data as string })
+    if (!data) { acceptingRef.current = false; return setState({ status: 'invalid' }) }
+
+    const workspaceId = data as string
+    const { data: ws } = await supabase.from('workspaces').select('name').eq('id', workspaceId).single()
+    setState({ status: 'success', workspaceId, workspaceName: ws?.name ?? 'the workspace' })
   }
 
   function handleGoToWorkspace() {
-    if (state.status === 'success') {
-      navigate(`/app/${state.workspaceId}/projects`, { replace: true })
-    }
+    if (state.status !== 'success') return
+    localStorage.setItem('pf-last-workspace', state.workspaceId)
+    navigate(`/app/${state.workspaceId}/projects`, { replace: true })
   }
 
   function handleAlreadyAccepted() {
@@ -84,7 +90,7 @@ export default function InvitePage() {
               <div className={styles.spinner} aria-hidden="true" />
             </div>
             <h1 className={styles.heading}>
-              {state.status === 'loading' ? 'Validating invitation…' : 'Accepting invitation…'}
+              {state.status === 'loading' ? 'Checking invitation…' : 'Joining workspace…'}
             </h1>
             <p className={styles.body}>Please wait a moment.</p>
           </>
@@ -97,7 +103,7 @@ export default function InvitePage() {
               <CheckCircle size={48} className={styles.iconSuccess} />
             </div>
             <h1 className={styles.heading}>You're in!</h1>
-            <p className={styles.body}>Invitation accepted. You now have access to the workspace.</p>
+            <p className={styles.body}>You've joined <strong>{state.workspaceName}</strong>. Ready to get started?</p>
             <Button onClick={handleGoToWorkspace}>Go to workspace</Button>
           </>
         )
@@ -108,8 +114,8 @@ export default function InvitePage() {
             <div className={styles.iconWrap}>
               <CheckCircle size={48} className={styles.iconSuccess} />
             </div>
-            <h1 className={styles.heading}>Already accepted</h1>
-            <p className={styles.body}>This invitation has already been accepted. You can go directly to the workspace.</p>
+            <h1 className={styles.heading}>Already a member</h1>
+            <p className={styles.body}>You're already a member of this workspace. Head there directly.</p>
             <Button onClick={handleAlreadyAccepted}>Go to app</Button>
           </>
         )
@@ -171,7 +177,7 @@ export default function InvitePage() {
             </div>
             <h1 className={styles.heading}>Something went wrong</h1>
             <p className={styles.body}>{state.message}</p>
-            <Button variant="ghost" onClick={() => token && acceptInvite(token)}>Try again</Button>
+            <Button variant="ghost" onClick={() => { acceptingRef.current = false; if (token) void acceptInvite(token) }}>Try again</Button>
           </>
         )
     }

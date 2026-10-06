@@ -7,6 +7,14 @@ import Input from '../components/ui/Input'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 
+const PENDING_INVITE_KEY = 'pf-pending-invite'
+
+function consumePendingInvite(): string | null {
+  const token = sessionStorage.getItem(PENDING_INVITE_KEY)
+  if (token) sessionStorage.removeItem(PENDING_INVITE_KEY)
+  return token
+}
+
 export default function RegisterPage() {
   const { session } = useAuth()
   const [email, setEmail] = useState('')
@@ -16,7 +24,12 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  if (session) return <Navigate to="/app" replace />
+  // If the user is already authenticated, resume any pending invite or go to app.
+  if (session) {
+    const pendingToken = consumePendingInvite()
+    if (pendingToken) return <Navigate to={`/invite/${pendingToken}`} replace />
+    return <Navigate to="/app" replace />
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
