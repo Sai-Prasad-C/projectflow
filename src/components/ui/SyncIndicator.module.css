@@ -21,7 +21,7 @@
 }
 
 .offline  { background: var(--color-surface-2); color: var(--color-text-3); }
-.offline .dot { background: #78716c; }
+.offline .dot { background: var(--color-text-3); }
 
 .syncing  { background: var(--color-primary); color: #fff; }
 .syncing .dot { background: #fff; animation: pulse 1s ease infinite; }
@@ -29,8 +29,8 @@
 .error    { background: var(--color-danger); color: #fff; }
 .error .dot { background: #fff; }
 
-.conflict { background: var(--color-warning); color: #111111; }
-.conflict .dot { background: #111111; }
+.conflict { background: var(--color-warning); color: var(--color-text); }
+.conflict .dot { background: var(--color-text); }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
