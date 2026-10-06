@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
-import { BarChart2, FolderKanban, LayoutGrid, LogOut, Plus, User, Users } from 'lucide-react'
+import { BarChart2, LayoutGrid, LogOut, Plus, User, Users } from 'lucide-react'
+import Brand from '../components/ui/Brand'
 import { WorkspaceContext } from '../context/workspace-context'
 import type { WorkspaceContextValue } from '../context/workspace-context'
 import { useAuth } from '../hooks/useAuth'
@@ -114,8 +115,7 @@ export default function WorkspaceLayout() {
         <aside className={styles.sidebar}>
           <div className={styles.sidebarHeader}>
             <Link to={projectsHref} className={styles.brand}>
-              <FolderKanban size={18} aria-hidden="true" />
-              ProjectFlow
+              <Brand size={20} />
             </Link>
             <div className={styles.workspaceSwitcherWrap}>
               <WorkspaceSwitcher currentWorkspace={state.workspace} />
@@ -156,8 +156,7 @@ export default function WorkspaceLayout() {
         {/* ── Mobile top bar ───────────────────────────────────── */}
         <header className={styles.topBar}>
           <Link to={projectsHref} className={styles.brand}>
-            <FolderKanban size={18} aria-hidden="true" />
-            ProjectFlow
+            <Brand size={18} />
           </Link>
           <WorkspaceSwitcher currentWorkspace={state.workspace} />
           <button

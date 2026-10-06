@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import Brand from '../components/ui/Brand'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import { useAuth } from '../hooks/useAuth'
@@ -68,7 +69,7 @@ export default function WorkspaceRedirectPage() {
   return (
     <div className={styles.center}>
       <div className={styles.card}>
-        <div className={styles.brand}>ProjectFlow</div>
+        <div className={styles.brand}><Brand size={28} showName /></div>
         <h1 className={styles.heading}>Create your workspace</h1>
         <p className={styles.sub}>
           A workspace is where you and your team manage projects together.

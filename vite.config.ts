@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
 
       // Static assets to precache as part of the app shell.
-      includeAssets: ['favicon.svg', 'icons/*.svg'],
+      includeAssets: ['favicon.svg', 'icons/*.svg', 'icons/*.png'],
 
       workbox: {
         // Precache all hashed JS/CSS bundles plus static assets.
@@ -48,21 +48,27 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/icons/icon-192.svg',
+            src: '/icons/projectflow-192.png',
             sizes: '192x192',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/icons/icon-512.svg',
+            src: '/icons/projectflow-512.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/icons/icon-maskable-512.svg',
+            src: '/icons/projectflow-maskable-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: '/icons/projectflow-maskable-512.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'maskable',
           },
         ],

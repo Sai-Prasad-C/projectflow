@@ -28,17 +28,17 @@
 .brand {
   font-weight: 800;
   font-size: 15px;
-  color: var(--color-primary);
+  color: var(--sidebar-text);
   text-decoration: none;
   letter-spacing: -0.3px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
   margin-bottom: 4px;
+  transition: opacity var(--transition);
 }
 
 .brand:hover {
-  color: var(--color-primary-hover);
+  opacity: 0.8;
   text-decoration: none;
 }
 
