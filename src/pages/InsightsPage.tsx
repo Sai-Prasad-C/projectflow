@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { TrendingUp } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -14,6 +14,10 @@ const PERIOD_SEGMENTS: Array<{ value: Period; label: string }> = [
   { value: '6m',  label: '6 months' },
   { value: 'all', label: 'All time' },
 ]
+
+function getTodayISO() {
+  return new Date().toISOString().slice(0, 10)
+}
 
 function periodCutoff(period: Period): Date | null {
   if (period === 'all') return null
@@ -96,7 +100,7 @@ export default function InsightsPage() {
   }, [workspaceId])
 
   const cutoff = periodCutoff(period)
-  const today = new Date().toISOString().slice(0, 10)
+  const today = useMemo(() => getTodayISO(), [])
 
   const filtered = cutoff
     ? allTasks.filter(t => new Date(t.created_at) >= cutoff)

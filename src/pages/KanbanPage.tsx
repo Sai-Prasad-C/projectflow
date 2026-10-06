@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Settings, Users, Plus } from 'lucide-react'
 import KanbanBoard from '../components/kanban/KanbanBoard'
@@ -17,6 +17,12 @@ import type { Project, Task, TaskStatus } from '../lib/types'
 import BottomSheet from '../components/ui/BottomSheet'
 import MemberList from '../components/workspace/MemberList'
 import styles from './KanbanPage.module.css'
+
+function getTodayMidnight() {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return d
+}
 
 type Tab = 'board' | 'list' | 'activity'
 
@@ -53,8 +59,7 @@ export default function KanbanPage() {
   const doneTasks = tasks.filter(t => t.status === 'done').length
   const openTasks = tasks.filter(t => t.status !== 'done').length
   const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const today = useMemo(() => getTodayMidnight(), [])
   const dueSoon = tasks.filter(t => {
     if (!t.due_date || t.status === 'done') return false
     const due = new Date(t.due_date)

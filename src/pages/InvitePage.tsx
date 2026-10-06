@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle, Clock, XCircle, AlertTriangle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
+import Brand from '../components/ui/Brand'
 import Button from '../components/ui/Button'
 import styles from './InvitePage.module.css'
 
@@ -179,7 +180,7 @@ export default function InvitePage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <p className={styles.brand}>ProjectFlow</p>
+        <div className={styles.brand}><Brand size={22} showName /></div>
         {content}
       </div>
     </div>
