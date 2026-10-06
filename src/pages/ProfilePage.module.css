@@ -92,6 +92,13 @@
   margin: 0 calc(-1 * var(--space-4));
 }
 
+.successNote {
+  font-size: 13px;
+  color: var(--color-success);
+  font-weight: 500;
+  margin: 0;
+}
+
 .fieldError {
   font-size: 13px;
   color: var(--color-danger);

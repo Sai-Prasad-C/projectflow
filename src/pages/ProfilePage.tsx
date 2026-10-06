@@ -30,6 +30,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [showEmailSheet, setShowEmailSheet] = useState(false)
+  const [emailUpdated, setEmailUpdated] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -111,6 +112,9 @@ export default function ProfilePage() {
               <span className={styles.rowLabel}>Email</span>
               <span className={styles.rowValue}>{user?.email}</span>
             </div>
+            {emailUpdated ? (
+              <p className={styles.successNote} role="status">Email updated</p>
+            ) : null}
             <div className={styles.divider} />
             <Button variant="ghost" onClick={() => setShowEmailSheet(true)}>
               Change email
@@ -142,6 +146,11 @@ export default function ProfilePage() {
         <ChangeEmailSheet
           currentEmail={user.email}
           onClose={() => setShowEmailSheet(false)}
+          onSuccess={() => {
+            setShowEmailSheet(false)
+            setEmailUpdated(true)
+            setTimeout(() => setEmailUpdated(false), 4000)
+          }}
         />
       )}
     </div>

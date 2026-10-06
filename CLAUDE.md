@@ -163,10 +163,14 @@ Use a helper SQL function `is_workspace_member(workspace_id uuid)` in policies t
 ## Account identity — non-negotiable
 
 - **Supabase Auth user UUID is the stable user identity.**
-- **Email is editable account metadata** and must never be used as the primary foreign key for workspace membership, task assignment, ownership, or authorization.
-- **Account/security changes such as email changes are online-only** and are never queued through offline sync.
-- Email change uses `supabase.auth.updateUser({ email: newEmail })` — confirmation-based, not immediate. Use `${window.location.origin}` as the redirect origin (no hardcoded localhost or production URL in source).
-- Workspace membership, task assignment, and ownership all remain tied to UUID; they are unaffected by email changes.
+- **Email is editable account metadata** and must never be the primary key for workspace membership, task assignment, ownership, or authorization.
+- **Account email changes are online-only** — never queue in IndexedDB/outbox.
+- **Current behavior: immediate server-side email change without confirmation email.** Implemented via the `change-account-email` Edge Function which uses `supabaseAdmin.auth.admin.updateUserById(caller.id, { email, email_confirm: true })`. The admin credential (`SUPABASE_SERVICE_ROLE_KEY`) is auto-injected into the Edge Function runtime and never exposed to the browser.
+- If email verification is added later, replace this immediate-change behavior deliberately rather than layering both flows.
+- The Edge Function derives the target UUID exclusively from the verified caller JWT — a user cannot supply another user's ID to change their email.
+- After success, the frontend calls `supabase.auth.refreshSession()` so `user.email` in AuthContext updates immediately without sign-out.
+- Workspace membership, task assignment, and ownership remain tied to UUID; they are unaffected by email changes.
+- The `profiles` table has no email column — `user.email` from the Auth session is the sole display source.
 
 ## Security rules
 
