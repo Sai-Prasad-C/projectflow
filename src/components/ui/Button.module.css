@@ -38,7 +38,7 @@
   background: var(--color-primary);
   color: var(--color-primary-fg);
   border-color: var(--color-primary);
-  box-shadow: 0 1px 3px 0 rgb(249 115 22 / 0.3);
+  box-shadow: 0 1px 3px 0 rgb(83 102 245 / 0.3);
 }
 
 .primary:hover:not(:disabled) {

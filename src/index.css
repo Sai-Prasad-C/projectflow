@@ -29,30 +29,43 @@ svg {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 
-  /* Colour — light (warm neutral + coral primary) */
-  --color-bg:           #fafaf9;
-  --color-surface:      #ffffff;
-  --color-surface-2:    #f5f4f2;
-  --color-border:       #e7e5e0;
-  --color-border-focus: #f97316;
+  /* Colour — Indigo Lightning light */
+  --color-bg:              #F7F7FC;
+  --color-surface:         #FFFFFF;
+  --color-surface-2:       #F1F0F8;
+  --color-surface-elevated:#FFFFFF;
+  --color-border:          #E2E0EC;
+  --color-border-strong:   #D2CFE0;
+  --color-border-focus:    #5366F5;
 
-  --color-text:         #1c1917;
-  --color-text-2:       #78716c;
-  --color-text-3:       #a8a29e;
+  --color-text:            #171620;
+  --color-text-2:          #777386;
+  --color-text-3:          #9893A5;
 
-  --color-primary:      #f97316;
-  --color-primary-hover:#ea6c0f;
-  --color-primary-fg:   #ffffff;
+  --color-primary:         #5366F5;
+  --color-primary-hover:   #4253E8;
+  --color-primary-fg:      #FFFFFF;
+  --color-primary-subtle:  color-mix(in srgb, #5366F5 10%, transparent);
 
-  --color-danger:       #ef4444;
-  --color-warning:      #f59e0b;
-  --color-success:      #10b981;
+  --color-danger:          #EF4444;
+  --color-warning:         #F59E0B;
+  --color-success:         #10B981;
 
-  /* Priority */
-  --color-priority-low:    #10b981;
-  --color-priority-medium: #f59e0b;
-  --color-priority-high:   #ef4444;
-  --color-priority-urgent: #7c3aed;
+  /* Priority — semantic, not brand */
+  --color-priority-low:    #10B981;
+  --color-priority-medium: #F59E0B;
+  --color-priority-high:   #EF4444;
+  --color-priority-urgent: #7C3AED;
+
+  /* Derived subtle variants */
+  --color-danger-subtle:   color-mix(in srgb, #EF4444 12%, transparent);
+  --color-success-subtle:  color-mix(in srgb, #10B981 12%, transparent);
+  --color-warning-subtle:  color-mix(in srgb, #F59E0B 12%, transparent);
+
+  /* Brand gradient — use sparingly: FAB, primary CTA */
+  --brand-gradient: linear-gradient(135deg, #5366F5, #8057E8);
+
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
 
   /* Spacing scale */
   --space-1:  4px;
@@ -80,13 +93,6 @@ svg {
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.08);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.18);
 
-  /* Semantic colour helpers (colour-mix needs a base value at token-definition time) */
-  --color-primary-subtle:  color-mix(in srgb, #f97316 12%, transparent);
-  --color-danger-subtle:   color-mix(in srgb, #ef4444 12%, transparent);
-  --color-success-subtle:  color-mix(in srgb, #10b981 12%, transparent);
-  --color-warning-subtle:  color-mix(in srgb, #f59e0b 12%, transparent);
-  --color-surface-elevated: var(--color-surface);
-
   /* Transitions */
   --transition: 150ms ease;
   --transition-slow: 250ms ease;
@@ -96,7 +102,6 @@ svg {
   --sidebar-rail-width: 64px;
   --topbar-height: 56px;
   --bottom-nav-height: 72px;
-  --color-bg-overlay: rgba(0, 0, 0, 0.5);
 
   /* Z-index layers — always use these, never scatter raw numbers */
   --z-sticky:         10;   /* topBar */
@@ -106,50 +111,58 @@ svg {
   --z-modal:         100;   /* bottom sheet / dialog panel */
   --z-toast:         200;   /* sync indicator, toasts — above modals */
 
-  /* Dark sidebar surface (used in both light + dark themes) */
-  --sidebar-bg:              #1c1917;
-  --sidebar-text:            #e7e3dc;
-  --sidebar-text-2:          #a8a29e;
-  --sidebar-text-3:          #6b6560;
-  --sidebar-nav-active-bg:   color-mix(in srgb, #f97316 18%, #1c1917);
-  --sidebar-nav-active-text: #ff9a52;
+  /* Dark sidebar surface (always dark — used in both light + dark themes) */
+  --sidebar-bg:              #0D0C17;
+  --sidebar-text:            #F0EEFF;
+  --sidebar-text-2:          #9B97B8;
+  --sidebar-text-3:          #5E5A76;
+  --sidebar-nav-active-bg:   color-mix(in srgb, #5B6CFF 20%, #0D0C17);
+  --sidebar-nav-active-text: #A5AAFF;
 }
 
 /* ── Dark theme ────────────────────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-bg:        #0f0e0d;
-    --color-surface:   #1c1917;
-    --color-surface-2: #292524;
-    --color-border:    #3d3835;
+    --color-bg:              #0B0B12;
+    --color-surface:         #11111A;
+    --color-surface-2:       #181827;
+    --color-surface-elevated:#202033;
+    --color-border:          #2C2B40;
+    --color-border-strong:   #3A3853;
+    --color-border-focus:    #5B6CFF;
 
-    --color-text:      #fafaf9;
-    --color-text-2:    #a8a29e;
-    --color-text-3:    #78716c;
+    --color-text:            #F8F7FF;
+    --color-text-2:          #9996AD;
+    --color-text-3:          #6E6B80;
 
-    --color-primary:         #fb923c;
-    --color-primary-hover:   #f97316;
-    --color-primary-fg:      #ffffff;
-    --color-primary-subtle:  color-mix(in srgb, #fb923c 16%, transparent);
-    --color-surface-elevated: #242220;
+    --color-primary:         #5B6CFF;
+    --color-primary-hover:   #6B7AFF;
+    --color-primary-fg:      #FFFFFF;
+    --color-primary-subtle:  color-mix(in srgb, #5B6CFF 15%, transparent);
+
+    --color-bg-overlay: rgba(0, 0, 0, 0.65);
   }
 }
 
 [data-theme="dark"] {
-  --color-bg:        #0f0e0d;
-  --color-surface:   #1c1917;
-  --color-surface-2: #292524;
-  --color-border:    #3d3835;
+  --color-bg:              #0B0B12;
+  --color-surface:         #11111A;
+  --color-surface-2:       #181827;
+  --color-surface-elevated:#202033;
+  --color-border:          #2C2B40;
+  --color-border-strong:   #3A3853;
+  --color-border-focus:    #5B6CFF;
 
-  --color-text:      #fafaf9;
-  --color-text-2:    #a8a29e;
-  --color-text-3:    #78716c;
+  --color-text:            #F8F7FF;
+  --color-text-2:          #9996AD;
+  --color-text-3:          #6E6B80;
 
-  --color-primary:         #fb923c;
-  --color-primary-hover:   #f97316;
-  --color-primary-fg:      #ffffff;
-  --color-primary-subtle:  color-mix(in srgb, #fb923c 16%, transparent);
-  --color-surface-elevated: #242220;
+  --color-primary:         #5B6CFF;
+  --color-primary-hover:   #6B7AFF;
+  --color-primary-fg:      #FFFFFF;
+  --color-primary-subtle:  color-mix(in srgb, #5B6CFF 15%, transparent);
+
+  --color-bg-overlay: rgba(0, 0, 0, 0.65);
 }
 
 /* ── Base elements ─────────────────────────────────────────────────── */

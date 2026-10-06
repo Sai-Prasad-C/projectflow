@@ -95,7 +95,7 @@
 
 .priorityDot[data-priority='low']    { background: var(--color-success); }
 .priorityDot[data-priority='medium'] { background: var(--color-warning); }
-.priorityDot[data-priority='high']   { background: #f97316; }
+.priorityDot[data-priority='high']   { background: var(--color-priority-high); }
 .priorityDot[data-priority='urgent'] { background: var(--color-danger); }
 
 .priorityLabel {
