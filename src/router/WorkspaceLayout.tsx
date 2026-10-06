@@ -42,6 +42,7 @@ export default function WorkspaceLayout() {
           .from('workspace_members')
           .select('role')
           .eq('workspace_id', workspaceId!)
+          .eq('user_id', user!.id)
           .single(),
       ])
       if (cancelled) return
