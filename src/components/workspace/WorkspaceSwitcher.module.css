@@ -5,8 +5,8 @@
   justify-content: space-between;
   gap: var(--space-2);
   width: 100%;
-  background: rgba(255 255 255 / 0.05);
-  border: 1px solid rgba(255 255 255 / 0.08);
+  background: var(--sidebar-trigger-bg);
+  border: 1px solid var(--sidebar-trigger-border);
   border-radius: var(--radius-md);
   padding: 7px var(--space-3);
   cursor: pointer;
@@ -16,8 +16,8 @@
 }
 
 .trigger:hover {
-  background: rgba(255 255 255 / 0.1);
-  border-color: rgba(255 255 255 / 0.14);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--sidebar-trigger-bg));
+  border-color: var(--color-primary);
 }
 
 .triggerName {
