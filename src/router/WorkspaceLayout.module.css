@@ -1,18 +1,18 @@
-/* ── Shell ───────────────────────────────────────────────── */
+/* ── Shell ───────────────────────────────────────── */
 .layout {
   display: flex;
   min-height: 100dvh;
 }
 
-/* ── Desktop Sidebar ─────────────────────────────────────── */
+/* ── Desktop Sidebar ─────────────────────────────── */
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   width: var(--sidebar-width);
   height: 100dvh;
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
+  background: var(--sidebar-bg);
+  border-right: 1px solid rgba(255 255 255 / 0.06);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -22,15 +22,15 @@
 
 .sidebarHeader {
   padding: var(--space-5) var(--space-4) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid rgba(255 255 255 / 0.06);
 }
 
 .brand {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 15px;
   color: var(--color-primary);
   text-decoration: none;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -44,7 +44,7 @@
 
 .workspaceName {
   font-size: 12px;
-  color: var(--color-text-3);
+  color: var(--sidebar-text-3);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -63,53 +63,52 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  padding: 10px var(--space-3);
   border-radius: var(--radius-md);
   font-size: 14px;
-  color: var(--color-text-2);
+  font-weight: 500;
+  color: var(--sidebar-text-2);
   text-decoration: none;
   transition: background var(--transition), color var(--transition);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  text-align: left;
 }
 
 .navItem:hover {
-  background: var(--color-surface-2);
-  color: var(--color-text);
+  background: rgba(255 255 255 / 0.06);
+  color: var(--sidebar-text);
   text-decoration: none;
 }
 
 .navItemActive {
-  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-  color: var(--color-primary);
-  font-weight: 500;
+  background: var(--sidebar-nav-active-bg);
+  color: var(--sidebar-nav-active-text);
+  font-weight: 600;
 }
 
 .navItemActive:hover {
-  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
-  color: var(--color-primary);
+  background: color-mix(in srgb, #f97316 24%, #1c1917);
 }
 
 .sidebarFooter {
-  padding: var(--space-4);
-  border-top: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-2);
+  border-top: 1px solid rgba(255 255 255 / 0.06);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-}
-
-.userRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-width: 0;
+  gap: 2px;
 }
 
 .userAvatar {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--color-primary);
-  color: var(--color-primary-fg);
-  font-size: 12px;
+  color: #fff;
+  font-size: 11px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -119,7 +118,7 @@
 
 .userEmail {
   font-size: 12px;
-  color: var(--color-text-3);
+  color: var(--sidebar-text-3);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -135,20 +134,21 @@
   border: none;
   cursor: pointer;
   font-size: 13px;
-  color: var(--color-text-3);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
+  color: var(--sidebar-text-3);
+  padding: 10px var(--space-3);
+  border-radius: var(--radius-md);
   transition: color var(--transition), background var(--transition);
   text-align: left;
   font-family: inherit;
+  width: 100%;
 }
 
 .signOutBtn:hover {
-  color: var(--color-text);
-  background: var(--color-surface-2);
+  color: var(--sidebar-text);
+  background: rgba(255 255 255 / 0.06);
 }
 
-/* ── Mobile top bar ──────────────────────────────────────── */
+/* ── Mobile top bar ──────────────────────────────── */
 .topBar {
   display: none;
 }
@@ -162,7 +162,7 @@
   white-space: nowrap;
 }
 
-.topBarSignOut {
+.topBarIcon {
   background: none;
   border: none;
   cursor: pointer;
@@ -175,14 +175,16 @@
   justify-content: center;
   transition: color var(--transition), background var(--transition);
   flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
 }
 
-.topBarSignOut:hover {
+.topBarIcon:hover {
   color: var(--color-text);
   background: var(--color-surface-2);
 }
 
-/* ── Main content ─────────────────────────────────────────── */
+/* ── Main content ────────────────────────────────── */
 .main {
   flex: 1;
   margin-left: var(--sidebar-width);
@@ -191,12 +193,12 @@
   box-sizing: border-box;
 }
 
-/* ── Mobile floating pill bottom nav ─────────────────────── */
+/* ── Mobile floating pill bottom nav ─────────────── */
 .bottomNav {
   display: none;
 }
 
-/* ── Loading / error center state ─────────────────────────── */
+/* ── Loading / error center state ────────────────── */
 .center {
   display: flex;
   justify-content: center;
@@ -209,7 +211,7 @@
   color: var(--color-text-2);
 }
 
-/* ── Mobile (<= 768px) ────────────────────────────────────── */
+/* ── Mobile (<= 768px) ───────────────────────────── */
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
@@ -222,7 +224,7 @@
   .topBar {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
     height: var(--topbar-height);
     padding: 0 var(--space-4);
     background: var(--color-surface);
@@ -280,6 +282,8 @@
     color: var(--color-text-3);
     text-decoration: none;
     transition: background var(--transition), color var(--transition);
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .pillItem:hover {
@@ -294,7 +298,6 @@
     font-weight: 500;
   }
 
-  /* Hide label by default; show it only when active */
   .pillLabel {
     font-size: 13px;
     font-weight: 500;
@@ -306,7 +309,6 @@
     display: inline;
   }
 
-  /* Coral FAB */
   .fab {
     display: flex;
     align-items: center;
@@ -315,7 +317,7 @@
     height: 52px;
     border-radius: 50%;
     background: var(--color-primary);
-    color: var(--color-primary-fg);
+    color: #fff;
     text-decoration: none;
     box-shadow: 0 4px 16px 0 rgb(249 115 22 / 0.45);
     transition: background var(--transition), transform var(--transition);
@@ -335,7 +337,7 @@
   }
 }
 
-/* ── Tablet icon-rail sidebar (768–1024px) ─────────────────── */
+/* ── Tablet icon-rail sidebar (769–1024px) ─────────── */
 @media (min-width: 769px) and (max-width: 1024px) {
   .sidebar {
     width: var(--sidebar-rail-width);
@@ -383,17 +385,13 @@
     align-items: center;
   }
 
-  .userRow {
-    justify-content: center;
-  }
-
   .userEmail {
     display: none;
   }
 
   .signOutBtn {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     justify-content: center;
     font-size: 0;

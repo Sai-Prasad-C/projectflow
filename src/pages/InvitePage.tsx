@@ -45,9 +45,7 @@ export default function InvitePage() {
 
   async function acceptInvite(t: string) {
     setState({ status: 'accepting' })
-    // accept_workspace_invitation RPC not yet in generated types (migration pending push)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.rpc as any)('accept_workspace_invitation', { p_token: t })
+    const { data, error } = await supabase.rpc('accept_workspace_invitation', { p_token: t })
 
     if (error) {
       const msg = error.message.toLowerCase()

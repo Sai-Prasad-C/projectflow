@@ -4,11 +4,10 @@
   background: var(--color-surface-2);
   border-radius: var(--radius-xl);
   padding: var(--space-3);
-  min-width: 270px;
-  width: 270px;
+  min-width: 255px;
+  width: 255px;
   flex-shrink: 0;
   gap: var(--space-2);
-  max-height: calc(100dvh - 200px);
   border: 1px solid var(--color-border);
   transition: border-color var(--transition), background var(--transition);
 }
@@ -27,8 +26,10 @@
 
 .statusLabel {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .count {
@@ -37,7 +38,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  padding: 1px 8px;
+  padding: 1px 7px;
   font-weight: 500;
 }
 
@@ -46,7 +47,7 @@
   flex-direction: column;
   gap: var(--space-2);
   flex: 1;
-  min-height: 60px;
+  min-height: 48px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
@@ -54,7 +55,7 @@
 
 .emptyDrop {
   flex: 1;
-  min-height: 60px;
+  min-height: 48px;
   border-radius: var(--radius-md);
   transition: background var(--transition);
 }
@@ -72,7 +73,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-3);
   padding: var(--space-2);
   border-radius: var(--radius-md);
@@ -80,6 +81,7 @@
   text-align: left;
   transition: color var(--transition), background var(--transition);
   font-family: inherit;
+  margin-top: var(--space-1);
 }
 
 .addBtn:hover {
@@ -87,13 +89,12 @@
   background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
-/* Mobile: snap-scroll column takes most of viewport width */
+/* Mobile: snap-scroll columns with peek of next */
 @media (max-width: 768px) {
   .column {
-    width: 85vw;
-    min-width: 85vw;
+    width: 84vw;
+    min-width: 84vw;
     scroll-snap-align: start;
-    max-height: unset;
     flex-shrink: 0;
   }
 }

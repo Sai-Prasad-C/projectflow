@@ -5,9 +5,13 @@
 }
 
 .sheetHeader {
-  padding: var(--space-5) var(--space-5) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-4) var(--space-4);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
+  gap: var(--space-3);
 }
 
 .title {
@@ -15,6 +19,27 @@
   font-weight: 700;
   margin: 0;
   color: var(--color-text);
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-3);
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+  flex-shrink: 0;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.closeBtn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-2);
 }
 
 .scrollArea {
@@ -144,38 +169,73 @@
   margin: var(--space-2) 0 0;
 }
 
-/* Invite link box */
-.linkBox {
+/* Invitation created success box */
+.successBox {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--color-success) 8%, var(--color-surface-2));
+  border: 1px solid color-mix(in srgb, var(--color-success) 25%, transparent);
+  border-radius: var(--radius-lg);
+}
+
+.successHeading {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-top: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface-2);
-  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.successIcon {
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+.successBody {
+  font-size: 12px;
+  color: var(--color-text-2);
+  margin: 0 0 var(--space-3);
+  line-height: 1.5;
+}
+
+.successBody strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.linkRow {
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  flex-wrap: wrap;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
 }
 
 .linkText {
-  flex: 1;
+  display: block;
   font-size: 11px;
   color: var(--color-text-2);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-mono);
-  min-width: 0;
+}
+
+.linkActions {
+  display: flex;
+  gap: var(--space-2);
 }
 
 .iconBtn {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: none;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 4px 8px;
+  padding: 6px 10px;
   font-size: 12px;
   font-family: var(--font-sans);
   color: var(--color-text-2);
@@ -183,11 +243,17 @@
   white-space: nowrap;
   flex-shrink: 0;
   transition: background var(--transition), color var(--transition);
+  min-height: 32px;
 }
 
 .iconBtn:hover {
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   color: var(--color-text);
+}
+
+.iconBtnSuccess {
+  color: var(--color-success);
+  border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
 }
 
 /* Pending invitations */

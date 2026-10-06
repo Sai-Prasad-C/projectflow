@@ -1,13 +1,14 @@
 // Edge Function: send-workspace-invite
-// Creates a workspace invitation and optionally delivers it via email.
+// Creates a workspace invitation and returns a shareable invite URL.
 //
 // POST /functions/v1/send-workspace-invite
 // Authorization: Bearer <user-jwt>
 // Body: { workspace_id, email, role? }
 //
-// Returns: { token?, inviteUrl, emailSent }
-// (token is omitted from the response when email delivery was requested,
-//  so the invite link is only reachable via email — unless sharing is explicit)
+// Returns: { inviteUrl, emailSent: false, sharingMode: "link" }
+//
+// Requires one environment variable:
+//   APP_URL — the deployed app base URL (e.g. https://flow-41w.pages.dev)
 
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
@@ -30,18 +31,12 @@ Deno.serve(async (req: Request) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-    // Use the user's JWT for authorization checks — do NOT bypass RLS
+    // Use the user's JWT — do NOT bypass RLS with service role
     const userClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     })
 
-    // Service-role client for looking up user emails (auth.users is not accessible
-    // via the user token due to RLS — only used to resolve inviter's display info)
-    const adminClient = createClient(supabaseUrl, serviceRoleKey)
-
-    // Verify caller is authenticated
     const { data: { user }, error: userErr } = await userClient.auth.getUser()
     if (userErr || !user) {
       return jsonError('Not authenticated', 401)
@@ -68,15 +63,14 @@ Deno.serve(async (req: Request) => {
     }
 
     // ── 3. Create invitation via the SECURITY DEFINER RPC ────────────────────
-    // The RPC handles all authorization checks (caller must be owner/admin)
-    // and stores the token hash — it returns the plaintext token.
+    // Authorization is enforced server-side: caller must be owner/admin.
+    // The RPC stores a token hash and returns the plaintext token once.
     const { data: token, error: rpcErr } = await userClient.rpc(
       'create_workspace_invitation',
       { p_workspace_id: workspace_id, p_email: email, p_role: role },
     )
 
     if (rpcErr) {
-      // Surface RPC-level authorization / validation errors to caller
       return jsonError(rpcErr.message, 403)
     }
 
@@ -85,67 +79,15 @@ Deno.serve(async (req: Request) => {
     }
 
     // ── 4. Build invite URL ───────────────────────────────────────────────────
-    const appUrl = Deno.env.get('APP_URL') ?? supabaseUrl
-    const inviteUrl = `${appUrl}/invite/${token}`
+    // Normalize APP_URL: remove trailing slash.
+    const rawAppUrl = Deno.env.get('APP_URL') ?? supabaseUrl
+    const appUrl = rawAppUrl.replace(/\/+$/, '')
+    const inviteUrl = `${appUrl}/invite/${encodeURIComponent(token as string)}`
 
-    // ── 5. Optional email delivery ────────────────────────────────────────────
-    const emailApiKey = Deno.env.get('EMAIL_PROVIDER_API_KEY')
-    const fromEmail   = Deno.env.get('INVITE_FROM_EMAIL') ?? 'noreply@projectflow.app'
-    let emailSent = false
-
-    if (emailApiKey) {
-      // Fetch workspace name for the email body
-      const { data: ws } = await adminClient
-        .from('workspaces')
-        .select('name')
-        .eq('id', workspace_id)
-        .single()
-
-      const workspaceName = ws?.name ?? 'a workspace'
-
-      // Fetch inviter display name
-      const { data: profile } = await adminClient
-        .from('profiles')
-        .select('display_name')
-        .eq('id', user.id)
-        .single()
-
-      const inviterName = profile?.display_name ?? user.email ?? 'Someone'
-
-      // Send via generic HTTP email provider (customize for Resend, SendGrid, etc.)
-      // This example uses the Resend API — adjust if using a different provider.
-      const emailRes = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${emailApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from:    fromEmail,
-          to:      [email],
-          subject: `${inviterName} invited you to join ${workspaceName} on ProjectFlow`,
-          html: `
-            <p>Hi,</p>
-            <p><strong>${inviterName}</strong> has invited you to join <strong>${workspaceName}</strong> on ProjectFlow as a <strong>${role}</strong>.</p>
-            <p><a href="${inviteUrl}" style="background:#f97316;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;display:inline-block;">Accept Invitation</a></p>
-            <p>This invitation expires in 7 days.</p>
-            <p>If you did not expect this invitation, you can safely ignore this email.</p>
-          `,
-        }),
-      })
-
-      emailSent = emailRes.ok
-
-      if (!emailRes.ok) {
-        // Email failure should not prevent the invitation from being usable.
-        // The plaintext token is still returned so the inviter can share the link manually.
-        console.error('Email delivery failed:', await emailRes.text())
-      }
-    }
-
-    // ── 6. Return invite URL (and token so inviter can copy the link) ─────────
+    // ── 5. Return invite URL for link sharing ─────────────────────────────────
+    // The raw token is NOT returned — inviteUrl is the only sharing surface.
     return new Response(
-      JSON.stringify({ inviteUrl, token, emailSent }),
+      JSON.stringify({ inviteUrl, emailSent: false, sharingMode: 'link' }),
       {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -153,7 +95,7 @@ Deno.serve(async (req: Request) => {
     )
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Internal server error'
-    console.error(msg)
+    console.error('send-workspace-invite error:', msg)
     return jsonError(msg, 500)
   }
 })

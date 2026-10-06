@@ -1,25 +1,19 @@
-.page {
-  display: flex;
-  flex-direction: column;
+/* ── Header ──────────────────────────────────────── */
+.header {
+  margin-bottom: var(--space-5);
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-5);
-  flex-wrap: wrap;
-  flex-shrink: 0;
+.breadcrumb {
+  margin-bottom: var(--space-3);
 }
 
 .backLink {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: 4px;
   font-size: 13px;
   color: var(--color-text-3);
   text-decoration: none;
-  flex-shrink: 0;
   transition: color var(--transition);
 }
 
@@ -28,26 +22,221 @@
   text-decoration: none;
 }
 
-.projectName {
-  font-size: 18px;
-  font-weight: 700;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
-/* Board wrapper — break out of the parent's horizontal padding so the
-   board can use the full available width and scroll cleanly */
+.titleGroup {
+  flex: 1;
+  min-width: 0;
+}
+
+.projectTitle {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  word-break: break-word;
+  line-height: 1.15;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.archivedBadge {
+  font-size: 12px;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-warning);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+.projectSub {
+  font-size: 13px;
+  color: var(--color-text-3);
+  margin: 4px 0 0;
+  word-break: break-word;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-2);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+  min-height: 36px;
+}
+
+.iconBtn:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border-color: var(--color-text-3);
+}
+
+.btnLabel {
+  display: inline;
+}
+
+.newTaskBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--color-primary);
+  border: none;
+  color: var(--color-primary-fg);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+  min-height: 36px;
+}
+
+.newTaskBtn:hover {
+  background: var(--color-primary-hover);
+}
+
+.newTaskBtn:active {
+  transform: scale(0.97);
+}
+
+/* ── Stats strip ─────────────────────────────────── */
+.stats {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 0.9fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.statCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+}
+
+.statHero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-3);
+}
+
+.statBig {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--color-text);
+  line-height: 1;
+  margin-top: var(--space-1);
+}
+
+.progressBar {
+  height: 6px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.progressBar span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+  transition: width 0.4s ease;
+}
+
+/* ── Tab nav ─────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0;
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--color-text-3);
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+  margin-bottom: -1px;
+}
+
+.tab:hover:not(:disabled) {
+  color: var(--color-text-2);
+}
+
+.tab:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.tabActive {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: 600;
+}
+
+.tabActive:hover {
+  color: var(--color-primary);
+}
+
+/* ── Board wrap ──────────────────────────────────── */
 .boardWrap {
   margin: 0 calc(-1 * var(--space-6));
   padding: 0 var(--space-6);
   overflow-x: auto;
   overflow-y: visible;
-  min-height: calc(100dvh - 220px);
+  min-height: calc(100dvh - 340px);
 }
 
+.boardWrap::-webkit-scrollbar {
+  height: 4px;
+}
+
+.boardWrap::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+/* ── Errors / loading ────────────────────────────── */
 .error {
   font-size: 13px;
   color: var(--color-danger);
@@ -56,7 +245,6 @@
   border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-4);
-  flex-shrink: 0;
 }
 
 .loading {
@@ -64,10 +252,37 @@
   font-size: 14px;
 }
 
+/* ── Mobile ──────────────────────────────────────── */
 @media (max-width: 768px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statHero {
+    grid-column: 1 / -1;
+  }
+
+  .projectTitle {
+    font-size: 22px;
+  }
+
+  .btnLabel {
+    display: none;
+  }
+
   .boardWrap {
     margin: 0 calc(-1 * var(--space-4));
     padding: 0;
-    min-height: calc(100dvh - 270px);
+    min-height: calc(100dvh - 380px);
+    overflow-x: auto;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
   }
 }

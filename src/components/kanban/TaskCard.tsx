@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react'
 import styles from './TaskCard.module.css'
 import type { MemberProfile, Task, TaskStatus } from '../../lib/types'
 
@@ -117,8 +118,9 @@ export default function TaskCard({
           className={`${styles.iconBtn} ${styles.deleteBtn}`}
           title="Delete task"
           onClick={handleDeleteClick}
+          aria-label="Delete task"
         >
-          ✕
+          <Trash2 size={12} aria-hidden="true" />
         </button>
       </div>
     </div>

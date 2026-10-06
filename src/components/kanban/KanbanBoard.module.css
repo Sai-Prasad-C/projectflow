@@ -1,30 +1,21 @@
 .board {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-items: flex-start;
-  overflow-x: auto;
-  overflow-y: visible;
   padding-bottom: var(--space-6);
-  min-height: calc(100dvh - 200px);
+  min-height: calc(100dvh - 320px);
 }
 
 .board::-webkit-scrollbar {
-  height: 6px;
+  display: none;
 }
 
-.board::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
-}
-
-/* Mobile: horizontal snap-scroll, each column about 85vw, next peeking */
 @media (max-width: 768px) {
   .board {
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    gap: var(--space-3);
     padding: 0 var(--space-4) var(--space-6);
-    /* Pull the board flush with the page edges via parent boardWrap negative margin */
-    min-height: calc(100dvh - 270px);
+    min-height: calc(100dvh - 420px);
+    gap: var(--space-3);
   }
 }

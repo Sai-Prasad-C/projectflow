@@ -97,6 +97,14 @@ svg {
   --topbar-height: 56px;
   --bottom-nav-height: 72px;
   --color-bg-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Dark sidebar surface (used in both light + dark themes) */
+  --sidebar-bg:              #1c1917;
+  --sidebar-text:            #e7e3dc;
+  --sidebar-text-2:          #a8a29e;
+  --sidebar-text-3:          #6b6560;
+  --sidebar-nav-active-bg:   color-mix(in srgb, #f97316 18%, #1c1917);
+  --sidebar-nav-active-text: #ff9a52;
 }
 
 /* ── Dark theme ────────────────────────────────────────────────────── */

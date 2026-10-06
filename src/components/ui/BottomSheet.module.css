@@ -36,11 +36,12 @@
   }
 
   .panel {
-    width: 100%;
-    max-width: 520px;
-    max-height: 90dvh;
+    width: 480px;
+    max-width: calc(100vw - var(--space-8));
+    max-height: 88dvh;
     border-radius: var(--radius-xl);
     padding-bottom: var(--space-6);
+    border: 1px solid var(--color-border);
     animation: scaleIn 200ms ease;
   }
 

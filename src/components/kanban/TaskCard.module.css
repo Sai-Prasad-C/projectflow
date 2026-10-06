@@ -9,7 +9,7 @@
   cursor: pointer;
   transition: box-shadow var(--transition), opacity var(--transition);
   user-select: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.04);
 }
 
 .card:hover {
@@ -22,10 +22,10 @@
 .card[data-priority="urgent"] { border-left-color: var(--color-priority-urgent); }
 
 .card.dragging {
-  opacity: 0.4;
+  opacity: 0.38;
+  box-shadow: none;
 }
 
-/* Drop-line indicators shown when a drag is active */
 .card.dropAbove::before {
   content: '';
   position: absolute;
@@ -49,12 +49,12 @@
 }
 
 .title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--color-text);
   margin-bottom: var(--space-2);
   word-break: break-word;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .meta {
@@ -64,7 +64,6 @@
   flex-wrap: wrap;
 }
 
-/* Hide the old dot — we now use left-border for priority */
 .priorityDot {
   display: none;
 }
@@ -74,7 +73,7 @@
   color: var(--color-text-3);
   background: var(--color-surface-2);
   border-radius: var(--radius-pill);
-  padding: 2px 8px;
+  padding: 2px 7px;
   white-space: nowrap;
 }
 
@@ -89,8 +88,8 @@
   border-radius: 50%;
   background: var(--color-primary);
   color: var(--color-primary-fg);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 9px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,11 +130,16 @@
   border: none;
   cursor: pointer;
   color: var(--color-text-3);
-  padding: 3px 5px;
+  padding: 4px 5px;
   border-radius: var(--radius-sm);
   font-size: 12px;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color var(--transition), background var(--transition);
+  min-width: 24px;
+  min-height: 24px;
 }
 
 .iconBtn:hover {
@@ -148,7 +152,6 @@
   background: color-mix(in srgb, var(--color-danger) 10%, transparent);
 }
 
-/* On pointer-capable devices hide the delete button until the card is hovered */
 @media (hover: hover) {
   .deleteBtn {
     opacity: 0;

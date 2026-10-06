@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Settings, Users, Plus } from 'lucide-react'
 import KanbanBoard from '../components/kanban/KanbanBoard'
 import TaskDetail from '../components/kanban/TaskDetail'
 import TaskForm from '../components/kanban/TaskForm'
+import ProjectForm from '../components/project/ProjectForm'
 import type { TaskFormValues } from '../components/kanban/TaskForm'
 import { useAuth } from '../hooks/useAuth'
 import { useMembers } from '../hooks/useMembers'
@@ -11,6 +12,8 @@ import { useTasks } from '../hooks/useTasks'
 import { useWorkspace } from '../hooks/useWorkspace'
 import { supabase } from '../lib/supabase'
 import type { Project, Task, TaskStatus } from '../lib/types'
+import BottomSheet from '../components/ui/BottomSheet'
+import MemberList from '../components/workspace/MemberList'
 import styles from './KanbanPage.module.css'
 
 type EditModal =
@@ -21,7 +24,7 @@ type EditModal =
 export default function KanbanPage() {
   const { workspaceId, projectId } = useParams<{ workspaceId: string; projectId: string }>()
   const { user } = useAuth()
-  const { workspace } = useWorkspace()
+  const { workspace, memberRole } = useWorkspace()
   const { members } = useMembers(workspaceId!)
   const { tasks, setTasks, loading, error: loadError } = useTasks(projectId!)
 
@@ -30,16 +33,30 @@ export default function KanbanPage() {
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null)
   const [editModal, setEditModal] = useState<EditModal>(null)
   const [moveError, setMoveError] = useState<string | null>(null)
+  const [showMembers, setShowMembers] = useState(false)
+  const [showProjectEdit, setShowProjectEdit] = useState(false)
 
-  // Derive the live task for the detail panel
+  const canManage = memberRole === 'owner' || memberRole === 'admin'
+
   const detailTask = detailTaskId ? (tasks.find(t => t.id === detailTaskId) ?? null) : null
-
-  // Resolve current user's display name from the members list
   const currentMember = members.find(m => m.user_id === user?.id)
   const currentUserDisplayName = currentMember?.display_name ?? user?.email ?? 'You'
   const currentUserAvatarUrl = currentMember?.avatar_url ?? null
 
-  // Load project name for the header
+  // Derived stats from already-fetched tasks
+  const totalTasks = tasks.length
+  const doneTasks = tasks.filter(t => t.status === 'done').length
+  const openTasks = tasks.filter(t => t.status !== 'done').length
+  const progress = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const dueSoon = tasks.filter(t => {
+    if (!t.due_date || t.status === 'done') return false
+    const due = new Date(t.due_date)
+    const diff = Math.round((due.getTime() - today.getTime()) / 86400000)
+    return diff >= 0 && diff <= 7
+  }).length
+
   useEffect(() => {
     if (!projectId || !workspaceId) return
     let cancelled = false
@@ -55,14 +72,11 @@ export default function KanbanPage() {
     return () => { cancelled = true }
   }, [projectId, workspaceId])
 
-  // Close detail panel if task is deleted
   useEffect(() => {
     if (detailTaskId && !tasks.find(t => t.id === detailTaskId)) {
       setDetailTaskId(null)
     }
   }, [tasks, detailTaskId])
-
-  // ── Position helpers ─────────────────────────────────────────────────
 
   function computePosition(destTasks: Task[], insertIndex: number): number {
     const clamped = Math.min(Math.max(0, insertIndex), destTasks.length)
@@ -71,8 +85,6 @@ export default function KanbanPage() {
     if (clamped >= destTasks.length) return destTasks[destTasks.length - 1].position + 1000
     return (destTasks[clamped - 1].position + destTasks[clamped].position) / 2
   }
-
-  // ── Mutations ────────────────────────────────────────────────────────
 
   async function handleCreateTask(values: TaskFormValues): Promise<string | null> {
     if (!projectId || !user) return 'Not authenticated.'
@@ -130,7 +142,6 @@ export default function KanbanPage() {
       .filter(t => t.status === newStatus && t.id !== taskId)
       .sort((a, b) => a.position - b.position)
 
-    // No-op detection for same-column reorder
     if (srcTask.status === newStatus) {
       const colTasks = tasks
         .filter(t => t.status === newStatus)
@@ -179,26 +190,119 @@ export default function KanbanPage() {
     return handleEditTask(editModal.task.id, values)
   }
 
-  // ── Render ───────────────────────────────────────────────────────────
+  async function handleEditProject(name: string, description: string): Promise<string | null> {
+    if (!project) return null
+    const { data, error } = await supabase
+      .from('projects')
+      .update({ name, description: description || null })
+      .eq('id', project.id)
+      .select()
+      .single()
+    if (error) return error.message
+    setProject(data as Project)
+    setShowProjectEdit(false)
+    return null
+  }
 
   if (loading) return <p className={styles.loading}>Loading…</p>
 
+  const isArchived = project?.archived_at !== null && project?.archived_at !== undefined
+
   return (
     <>
+      {/* ── Project header ─────────────────────────────────── */}
       <div className={styles.header}>
-        <Link
-          to={`/app/${workspaceId}/projects/${projectId}`}
-          className={styles.backLink}
-        >
-          <ArrowLeft size={14} aria-hidden="true" />
-          {project?.name ?? 'Project'}
-        </Link>
-        <h1 className={styles.projectName}>{workspace.name}</h1>
+        <div className={styles.breadcrumb}>
+          <Link to={`/app/${workspaceId}/projects`} className={styles.backLink}>
+            <ArrowLeft size={14} aria-hidden="true" />
+            Projects
+          </Link>
+        </div>
+
+        <div className={styles.titleRow}>
+          <div className={styles.titleGroup}>
+            <h1 className={styles.projectTitle}>
+              {project?.name ?? 'Board'}
+              {isArchived ? <span className={styles.archivedBadge}>Archived</span> : null}
+            </h1>
+            <p className={styles.projectSub}>
+              {workspace.name}{members.length > 0 ? ` · ${members.length} member${members.length !== 1 ? 's' : ''}` : ''}
+            </p>
+          </div>
+          <div className={styles.headerActions}>
+            <button
+              type="button"
+              className={styles.iconBtn}
+              onClick={() => setShowMembers(true)}
+              aria-label="Members"
+            >
+              <Users size={16} aria-hidden="true" />
+              <span className={styles.btnLabel}>Members</span>
+            </button>
+            {canManage ? (
+              <button
+                type="button"
+                className={styles.iconBtn}
+                onClick={() => setShowProjectEdit(true)}
+                aria-label="Project settings"
+              >
+                <Settings size={16} aria-hidden="true" />
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className={styles.newTaskBtn}
+              onClick={() => setEditModal({ mode: 'create', defaultStatus: 'todo' })}
+            >
+              <Plus size={15} strokeWidth={2.5} aria-hidden="true" />
+              New task
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Stats strip ────────────────────────────────────── */}
+      {totalTasks > 0 ? (
+        <div className={styles.stats}>
+          <div className={`${styles.statCard} ${styles.statHero}`}>
+            <div className={styles.statLabel}>Progress</div>
+            <div className={styles.statBig}>{progress}%</div>
+            <div className={styles.progressBar}>
+              <span style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statLabel}>Open</div>
+            <div className={styles.statBig}>{openTasks}</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statLabel}>Due soon</div>
+            <div className={styles.statBig}>{dueSoon}</div>
+          </div>
+          <div className={styles.statCard}>
+            <div className={styles.statLabel}>Members</div>
+            <div className={styles.statBig}>{members.length}</div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Tab nav ────────────────────────────────────────── */}
+      <div className={styles.tabs} role="tablist">
+        <button type="button" className={`${styles.tab} ${styles.tabActive}`} role="tab" aria-selected="true">
+          Board
+        </button>
+        <button type="button" className={styles.tab} role="tab" aria-selected="false" disabled>
+          List
+        </button>
+        <button type="button" className={styles.tab} role="tab" aria-selected="false" disabled>
+          Activity
+        </button>
       </div>
 
       {loadError ? <p className={styles.error}>{loadError}</p> : null}
       {moveError ? <p className={styles.error}>{moveError}</p> : null}
 
+      {/* ── Board ──────────────────────────────────────────── */}
       <div className={styles.boardWrap}>
         <KanbanBoard
           tasks={tasks}
@@ -244,6 +348,23 @@ export default function KanbanPage() {
           submitLabel={editModal.mode === 'create' ? 'Create task' : 'Save changes'}
           onSubmit={handleModalSubmit}
           onCancel={() => setEditModal(null)}
+        />
+      ) : null}
+
+      {showMembers ? (
+        <BottomSheet onClose={() => setShowMembers(false)} aria-labelledby="members-title">
+          <MemberList workspaceId={workspaceId!} onClose={() => setShowMembers(false)} />
+        </BottomSheet>
+      ) : null}
+
+      {showProjectEdit && project ? (
+        <ProjectForm
+          heading="Edit project"
+          initialName={project.name}
+          initialDescription={project.description ?? ''}
+          submitLabel="Save changes"
+          onSubmit={handleEditProject}
+          onCancel={() => setShowProjectEdit(false)}
         />
       ) : null}
     </>

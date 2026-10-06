@@ -156,14 +156,11 @@ export default function WorkspaceLayout() {
           <span className={styles.topBarWorkspace}>{state.workspace.name}</span>
           <button
             type="button"
-            className={styles.topBarSignOut}
+            className={styles.topBarIcon}
             onClick={() => setShowMembers(true)}
             aria-label="Members"
           >
             <Users size={18} />
-          </button>
-          <button type="button" className={styles.topBarSignOut} onClick={handleSignOut} aria-label="Sign out">
-            <LogOut size={18} />
           </button>
         </header>
 

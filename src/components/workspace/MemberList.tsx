@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { Copy, Link, Send } from 'lucide-react'
+import { Copy, Share2, Send, CheckCircle, X } from 'lucide-react'
 import type { WorkspaceRole } from '../../lib/types'
 import { WorkspaceContext } from '../../context/workspace-context'
 import { useAuth } from '../../hooks/useAuth'
@@ -36,7 +36,7 @@ function roleLabel(role: WorkspaceRole): string {
   return 'Member'
 }
 
-export default function MemberList({ workspaceId }: Props) {
+export default function MemberList({ workspaceId, onClose }: Props) {
   const { members, loading } = useMembers(workspaceId)
   const ctx = useContext(WorkspaceContext)
   const { user } = useAuth()
@@ -46,8 +46,8 @@ export default function MemberList({ workspaceId }: Props) {
   const [inviteRole, setInviteRole] = useState<'member' | 'admin'>('member')
   const [inviting, setInviting] = useState(false)
   const [inviteError, setInviteError] = useState<string | null>(null)
-  const [inviteLink, setInviteLink] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [createdInvite, setCreatedInvite] = useState<{ url: string; email: string; role: 'member' | 'admin' } | null>(null)
+  const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
 
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([])
 
@@ -57,9 +57,7 @@ export default function MemberList({ workspaceId }: Props) {
   }, [workspaceId, canInvite]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadPendingInvites() {
-    // workspace_invitations is not yet in generated types (migration pending push)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (supabase as any)
+    const { data } = await supabase
       .from('workspace_invitations')
       .select('id, email, role, created_at, expires_at')
       .eq('workspace_id', workspaceId)
@@ -74,14 +72,16 @@ export default function MemberList({ workspaceId }: Props) {
     if (!inviteEmail.trim()) return
     setInviting(true)
     setInviteError(null)
-    setInviteLink(null)
+    setCreatedInvite(null)
 
-    // Call Edge Function which creates the invitation and optionally emails it
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) { setInviteError('Not authenticated'); setInviting(false); return }
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
     const fnUrl = `${supabaseUrl}/functions/v1/send-workspace-invite`
+
+    const emailForInvite = inviteEmail.trim()
+    const roleForInvite = inviteRole
 
     try {
       const res = await fetch(fnUrl, {
@@ -92,19 +92,21 @@ export default function MemberList({ workspaceId }: Props) {
         },
         body: JSON.stringify({
           workspace_id: workspaceId,
-          email: inviteEmail.trim(),
-          role: inviteRole,
+          email: emailForInvite,
+          role: roleForInvite,
         }),
       })
 
-      const json = await res.json() as { inviteUrl?: string; token?: string; error?: string }
+      const json = await res.json() as { inviteUrl?: string; error?: string }
 
       if (!res.ok) {
         setInviteError(json.error ?? 'Failed to create invitation')
         return
       }
 
-      setInviteLink(json.inviteUrl ?? null)
+      if (json.inviteUrl) {
+        setCreatedInvite({ url: json.inviteUrl, email: emailForInvite, role: roleForInvite })
+      }
       setInviteEmail('')
       void loadPendingInvites()
     } catch {
@@ -115,25 +117,35 @@ export default function MemberList({ workspaceId }: Props) {
   }
 
   async function handleRevoke(inviteId: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
+    await supabase
       .from('workspace_invitations')
       .update({ revoked_at: new Date().toISOString() })
       .eq('id', inviteId)
     void loadPendingInvites()
   }
 
-  async function copyLink(link: string) {
-    await navigator.clipboard.writeText(link)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  async function copyLink(url: string) {
+    await navigator.clipboard.writeText(url)
+    setCopyState('copied')
+    setTimeout(() => setCopyState('idle'), 2500)
   }
 
-  async function shareLink(link: string) {
-    if (navigator.share) {
-      await navigator.share({ title: 'ProjectFlow invitation', url: link })
+  async function shareInvite(url: string) {
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({
+          title: 'ProjectFlow workspace invitation',
+          text: "You've been invited to join my ProjectFlow workspace.",
+          url,
+        })
+      } catch (err) {
+        // User dismissed the share sheet — not an error
+        if (err instanceof Error && err.name === 'AbortError') return
+        // Web Share failed for another reason; fall back to clipboard
+        await copyLink(url)
+      }
     } else {
-      await copyLink(link)
+      await copyLink(url)
     }
   }
 
@@ -143,6 +155,9 @@ export default function MemberList({ workspaceId }: Props) {
         <h2 id="members-title" className={styles.title}>
           Members{loading ? '' : ` · ${members.length}`}
         </h2>
+        <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">
+          <X size={18} aria-hidden="true" />
+        </button>
       </div>
 
       <div className={styles.scrollArea}>
@@ -203,30 +218,39 @@ export default function MemberList({ workspaceId }: Props) {
             </div>
             {inviteError && <p className={styles.error}>{inviteError}</p>}
 
-            {/* Share invite link after creation */}
-            {inviteLink && (
-              <div className={styles.linkBox}>
-                <span className={styles.linkText} title={inviteLink}>{inviteLink}</span>
-                <button
-                  type="button"
-                  className={styles.iconBtn}
-                  onClick={() => copyLink(inviteLink)}
-                  aria-label="Copy link"
-                >
-                  <Copy size={14} />
-                  {copied ? 'Copied!' : 'Copy'}
-                </button>
-                {typeof navigator.share === 'function' && (
+            {/* Invitation created — link sharing surface */}
+            {createdInvite && (
+              <div className={styles.successBox}>
+                <div className={styles.successHeading}>
+                  <CheckCircle size={15} className={styles.successIcon} aria-hidden="true" />
+                  Invitation created
+                </div>
+                <p className={styles.successBody}>
+                  Share this link with <strong>{createdInvite.email}</strong>. Only that account can accept it.
+                </p>
+                <div className={styles.linkRow}>
+                  <span className={styles.linkText} title={createdInvite.url}>{createdInvite.url}</span>
+                </div>
+                <div className={styles.linkActions}>
+                  <button
+                    type="button"
+                    className={`${styles.iconBtn} ${copyState === 'copied' ? styles.iconBtnSuccess : ''}`}
+                    onClick={() => copyLink(createdInvite.url)}
+                    aria-label="Copy invitation link"
+                  >
+                    {copyState === 'copied' ? <CheckCircle size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
+                    {copyState === 'copied' ? 'Copied!' : 'Copy link'}
+                  </button>
                   <button
                     type="button"
                     className={styles.iconBtn}
-                    onClick={() => shareLink(inviteLink)}
-                    aria-label="Share link"
+                    onClick={() => shareInvite(createdInvite.url)}
+                    aria-label="Share invitation"
                   >
-                    <Link size={14} />
+                    <Share2 size={14} aria-hidden="true" />
                     Share
                   </button>
-                )}
+                </div>
               </div>
             )}
           </div>
