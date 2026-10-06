@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
+import { FolderKanban, LayoutGrid, LogOut, Plus } from 'lucide-react'
 import { WorkspaceContext } from '../context/workspace-context'
 import type { WorkspaceContextValue } from '../context/workspace-context'
 import { useAuth } from '../hooks/useAuth'
@@ -91,7 +92,10 @@ export default function WorkspaceLayout() {
         {/* ── Desktop sidebar ──────────────────────────────────── */}
         <aside className={styles.sidebar}>
           <div className={styles.sidebarHeader}>
-            <Link to={projectsHref} className={styles.brand}>ProjectFlow</Link>
+            <Link to={projectsHref} className={styles.brand}>
+              <FolderKanban size={18} aria-hidden="true" />
+              ProjectFlow
+            </Link>
             <div className={styles.workspaceName}>{state.workspace.name}</div>
           </div>
 
@@ -102,6 +106,7 @@ export default function WorkspaceLayout() {
                 `${styles.navItem}${isActive ? ` ${styles.navItemActive}` : ''}`
               }
             >
+              <LayoutGrid size={16} aria-hidden="true" />
               Projects
             </NavLink>
           </nav>
@@ -112,6 +117,7 @@ export default function WorkspaceLayout() {
               <span className={styles.userEmail}>{user?.email}</span>
             </div>
             <button type="button" className={styles.signOutBtn} onClick={handleSignOut}>
+              <LogOut size={14} aria-hidden="true" />
               Sign out
             </button>
           </div>
@@ -119,10 +125,13 @@ export default function WorkspaceLayout() {
 
         {/* ── Mobile top bar ───────────────────────────────────── */}
         <header className={styles.topBar}>
-          <Link to={projectsHref} className={styles.brand}>ProjectFlow</Link>
+          <Link to={projectsHref} className={styles.brand}>
+            <FolderKanban size={18} aria-hidden="true" />
+            ProjectFlow
+          </Link>
           <span className={styles.topBarWorkspace}>{state.workspace.name}</span>
-          <button type="button" className={styles.topBarSignOut} onClick={handleSignOut}>
-            Sign out
+          <button type="button" className={styles.topBarSignOut} onClick={handleSignOut} aria-label="Sign out">
+            <LogOut size={18} />
           </button>
         </header>
 
@@ -131,17 +140,23 @@ export default function WorkspaceLayout() {
           <Outlet />
         </main>
 
-        {/* ── Mobile bottom nav ────────────────────────────────── */}
+        {/* ── Mobile floating pill bottom nav ──────────────────── */}
         <nav className={styles.bottomNav} aria-label="Main navigation">
-          <NavLink
-            to={projectsHref}
-            className={({ isActive }) =>
-              `${styles.bottomNavItem}${isActive ? ` ${styles.bottomNavItemActive}` : ''}`
-            }
-          >
-            <span className={styles.bottomNavIcon} aria-hidden="true">⊞</span>
-            Projects
-          </NavLink>
+          <div className={styles.pill}>
+            <NavLink
+              to={projectsHref}
+              className={({ isActive }) =>
+                `${styles.pillItem}${isActive ? ` ${styles.pillItemActive}` : ''}`
+              }
+            >
+              <LayoutGrid size={20} aria-hidden="true" />
+              <span className={styles.pillLabel}>Projects</span>
+            </NavLink>
+
+            <Link to={projectsHref} className={styles.fab} aria-label="New project">
+              <Plus size={22} strokeWidth={2.5} />
+            </Link>
+          </div>
         </nav>
 
       </div>

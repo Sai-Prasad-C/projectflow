@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react'
+import { X } from 'lucide-react'
 import { useComments } from '../../hooks/useComments'
 import type { Comment } from '../../hooks/useComments'
 import { timeAgo } from '../../lib/format'
 import { supabase } from '../../lib/supabase'
 import type { MemberProfile, Task } from '../../lib/types'
 import Button from '../ui/Button'
+import BottomSheet from '../ui/BottomSheet'
 import styles from './TaskDetail.module.css'
 
 const STATUS_LABELS: Record<Task['status'], string> = {
@@ -125,20 +127,14 @@ export default function TaskDetail({
   const { comments, setComments, loading: commentsLoading, error: commentsError } = useComments(task.id)
   const assignee = members.find(m => m.user_id === task.assignee_id)
 
-  // New comment input
   const [body, setBody] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // Inline edit state
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editBody, setEditBody] = useState('')
   const [savingId, setSavingId] = useState<string | null>(null)
-
-  function handleOverlayClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (e.target === e.currentTarget) onClose()
-  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -201,98 +197,93 @@ export default function TaskDetail({
   }
 
   return (
-    <div className={styles.overlay} onClick={handleOverlayClick}>
-      <div className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="td-title">
-        {/* Header */}
-        <div className={styles.header}>
-          <h2 id="td-title" className={styles.headerTitle}>{task.title}</h2>
-          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">
-            ✕
-          </button>
-        </div>
-
-        {/* Scrollable body */}
-        <div className={styles.body}>
-          {/* Status + priority chips */}
-          <div className={styles.chips}>
-            <span className={styles.chip}>{STATUS_LABELS[task.status]}</span>
-            <span className={styles.chip} data-priority={task.priority}>
-              {PRIORITY_LABELS[task.priority]}
-            </span>
-          </div>
-
-          {/* Description */}
-          {task.description
-            ? <p className={styles.description}>{task.description}</p>
-            : <p className={styles.noDescription}>No description</p>
-          }
-
-          {/* Assignee + due date */}
-          {assignee ? (
-            <div className={styles.metaRow}>
-              <span className={styles.metaLabel}>Assignee</span>
-              <span>{assignee.display_name}</span>
-            </div>
-          ) : null}
-          {task.due_date ? (
-            <div className={styles.metaRow}>
-              <span className={styles.metaLabel}>Due date</span>
-              <span>{new Date(task.due_date).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-            </div>
-          ) : null}
-
-          {/* Edit button */}
-          <div className={styles.editBtn}>
-            <Button variant="ghost" onClick={onEdit}>Edit task</Button>
-          </div>
-
-          <hr className={styles.commentsDivider} />
-          <div className={styles.commentsHeading}>Comments</div>
-
-          {commentsLoading ? (
-            <p className={styles.commentsLoading}>Loading comments…</p>
-          ) : commentsError ? (
-            <p className={styles.commentsError}>{commentsError}</p>
-          ) : comments.length === 0 ? (
-            <p className={styles.commentsEmpty}>No comments yet. Be the first to leave one.</p>
-          ) : (
-            comments.map(c => (
-              <CommentItem
-                key={c.id}
-                comment={c}
-                isOwn={c.author_id === userId}
-                editingId={editingId}
-                editBody={editBody}
-                savingId={savingId}
-                onStartEdit={handleStartEdit}
-                onEditBodyChange={setEditBody}
-                onSave={handleEditSave}
-                onCancelEdit={() => setEditingId(null)}
-                onDelete={handleDelete}
-              />
-            ))
-          )}
-        </div>
-
-        {/* Sticky comment input */}
-        <form className={styles.commentForm} onSubmit={handleSubmit} noValidate>
-          <textarea
-            ref={textareaRef}
-            className={styles.textarea}
-            value={body}
-            onChange={e => setBody(e.target.value)}
-            placeholder="Add a comment…"
-            maxLength={10000}
-            rows={2}
-          />
-          <div className={styles.formFooter}>
-            <span className={styles.submitError}>{submitError ?? ''}</span>
-            <Button type="submit" loading={submitting} disabled={!body.trim()}>
-              Comment
-            </Button>
-          </div>
-        </form>
+    <BottomSheet onClose={onClose} aria-labelledby="td-title">
+      {/* Header */}
+      <div className={styles.header}>
+        <h2 id="td-title" className={styles.headerTitle}>{task.title}</h2>
+        <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">
+          <X size={18} />
+        </button>
       </div>
-    </div>
+
+      {/* Status + priority chips */}
+      <div className={styles.chips}>
+        <span className={styles.chip}>{STATUS_LABELS[task.status]}</span>
+        <span className={styles.chip} data-priority={task.priority}>
+          {PRIORITY_LABELS[task.priority]}
+        </span>
+      </div>
+
+      {/* Description */}
+      {task.description
+        ? <p className={styles.description}>{task.description}</p>
+        : <p className={styles.noDescription}>No description</p>
+      }
+
+      {/* Assignee + due date */}
+      {assignee ? (
+        <div className={styles.metaRow}>
+          <span className={styles.metaLabel}>Assignee</span>
+          <span>{assignee.display_name}</span>
+        </div>
+      ) : null}
+      {task.due_date ? (
+        <div className={styles.metaRow}>
+          <span className={styles.metaLabel}>Due date</span>
+          <span>{new Date(task.due_date).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+        </div>
+      ) : null}
+
+      {/* Edit button */}
+      <div className={styles.editBtn}>
+        <Button variant="ghost" onClick={onEdit}>Edit task</Button>
+      </div>
+
+      <hr className={styles.commentsDivider} />
+      <div className={styles.commentsHeading}>Comments</div>
+
+      {commentsLoading ? (
+        <p className={styles.commentsLoading}>Loading comments…</p>
+      ) : commentsError ? (
+        <p className={styles.commentsError}>{commentsError}</p>
+      ) : comments.length === 0 ? (
+        <p className={styles.commentsEmpty}>No comments yet. Be the first to leave one.</p>
+      ) : (
+        comments.map(c => (
+          <CommentItem
+            key={c.id}
+            comment={c}
+            isOwn={c.author_id === userId}
+            editingId={editingId}
+            editBody={editBody}
+            savingId={savingId}
+            onStartEdit={handleStartEdit}
+            onEditBodyChange={setEditBody}
+            onSave={handleEditSave}
+            onCancelEdit={() => setEditingId(null)}
+            onDelete={handleDelete}
+          />
+        ))
+      )}
+
+      {/* Comment input */}
+      <form className={styles.commentForm} onSubmit={handleSubmit} noValidate>
+        <textarea
+          ref={textareaRef}
+          className={styles.textarea}
+          value={body}
+          onChange={e => setBody(e.target.value)}
+          placeholder="Add a comment…"
+          maxLength={10000}
+          rows={2}
+        />
+        <div className={styles.formFooter}>
+          <span className={styles.submitError}>{submitError ?? ''}</span>
+          <Button type="submit" loading={submitting} disabled={!body.trim()}>
+            Comment
+          </Button>
+        </div>
+      </form>
+    </BottomSheet>
   )
 }

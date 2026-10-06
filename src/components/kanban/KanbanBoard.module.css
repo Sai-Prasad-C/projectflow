@@ -3,11 +3,10 @@
   gap: var(--space-4);
   align-items: stretch;
   overflow-x: auto;
-  padding-bottom: var(--space-4);
-  min-height: calc(100svh - 240px);
+  padding-bottom: var(--space-6);
+  min-height: calc(100dvh - 200px);
 }
 
-/* Ensure scroll region has some bottom breathing room */
 .board::-webkit-scrollbar {
   height: 6px;
 }
@@ -15,4 +14,15 @@
 .board::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 3px;
+}
+
+/* Mobile: horizontal snap scroll, each column takes ~85vw */
+@media (max-width: 768px) {
+  .board {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: var(--space-3);
+    padding: 0 var(--space-4) var(--space-6);
+    margin: 0 calc(var(--space-4) * -1);
+  }
 }

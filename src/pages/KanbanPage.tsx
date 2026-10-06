@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import KanbanBoard from '../components/kanban/KanbanBoard'
 import TaskDetail from '../components/kanban/TaskDetail'
 import TaskForm from '../components/kanban/TaskForm'
@@ -189,7 +190,8 @@ export default function KanbanPage() {
           to={`/app/${workspaceId}/projects/${projectId}`}
           className={styles.backLink}
         >
-          ← {project?.name ?? 'Project'}
+          <ArrowLeft size={14} aria-hidden="true" />
+          {project?.name ?? 'Project'}
         </Link>
         <h1 className={styles.projectName}>{workspace.name}</h1>
       </div>

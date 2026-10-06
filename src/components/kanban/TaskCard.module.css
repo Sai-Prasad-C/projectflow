@@ -2,6 +2,8 @@
   position: relative;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-left-width: 3px;
+  border-left-color: var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-3);
   cursor: pointer;
@@ -12,6 +14,11 @@
 .card:hover {
   box-shadow: var(--shadow-md);
 }
+
+.card[data-priority="low"]    { border-left-color: var(--color-priority-low); }
+.card[data-priority="medium"] { border-left-color: var(--color-priority-medium); }
+.card[data-priority="high"]   { border-left-color: var(--color-priority-high); }
+.card[data-priority="urgent"] { border-left-color: var(--color-priority-urgent); }
 
 .card.dragging {
   opacity: 0.4;
@@ -46,6 +53,7 @@
   color: var(--color-text);
   margin-bottom: var(--space-2);
   word-break: break-word;
+  line-height: 1.4;
 }
 
 .meta {
@@ -55,24 +63,17 @@
   flex-wrap: wrap;
 }
 
+/* Hide the old dot — we now use left-border for priority */
 .priorityDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
+  display: none;
 }
-
-.priorityDot[data-priority="low"]    { background: var(--color-priority-low); }
-.priorityDot[data-priority="medium"] { background: var(--color-priority-medium); }
-.priorityDot[data-priority="high"]   { background: var(--color-priority-high); }
-.priorityDot[data-priority="urgent"] { background: var(--color-priority-urgent); }
 
 .chip {
   font-size: 11px;
   color: var(--color-text-3);
   background: var(--color-surface-2);
   border-radius: var(--radius-sm);
-  padding: 1px 6px;
+  padding: 2px 7px;
   white-space: nowrap;
 }
 
@@ -94,6 +95,7 @@
   justify-content: center;
   flex-shrink: 0;
   text-transform: uppercase;
+  margin-left: auto;
 }
 
 .actions {
@@ -108,7 +110,7 @@
 .statusSelect {
   flex: 1;
   font-size: 11px;
-  padding: 2px 4px;
+  padding: 3px 5px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-bg);
@@ -128,7 +130,7 @@
   border: none;
   cursor: pointer;
   color: var(--color-text-3);
-  padding: 2px 4px;
+  padding: 3px 5px;
   border-radius: var(--radius-sm);
   font-size: 12px;
   line-height: 1;

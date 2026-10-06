@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { LayoutGrid, Plus } from 'lucide-react'
 import ProjectCard from '../components/project/ProjectCard'
 import ProjectForm from '../components/project/ProjectForm'
 import Button from '../components/ui/Button'
+import EmptyState from '../components/ui/EmptyState'
 import { supabase } from '../lib/supabase'
 import type { ProjectWithTaskCount } from '../lib/types'
 import styles from './ProjectListPage.module.css'
@@ -72,18 +74,26 @@ export default function ProjectListPage() {
     <>
       <div className={styles.header}>
         <h1 className={styles.title}>Projects</h1>
-        <Button onClick={() => setShowCreate(true)}>New project</Button>
+        <Button onClick={() => setShowCreate(true)}>
+          <Plus size={16} aria-hidden="true" />
+          New project
+        </Button>
       </div>
 
       {error ? <p className={styles.error}>{error}</p> : null}
 
       {!error && projects.length === 0 ? (
-        <div className={styles.empty}>
-          <div className={styles.emptyIcon} aria-hidden="true">⊞</div>
-          <p className={styles.emptyTitle}>No projects yet</p>
-          <p className={styles.emptySub}>Create your first project to start managing tasks.</p>
-          <Button onClick={() => setShowCreate(true)}>New project</Button>
-        </div>
+        <EmptyState
+          icon={<LayoutGrid size={40} strokeWidth={1.5} />}
+          heading="No projects yet"
+          body="Create your first project to start managing tasks with your team."
+          action={
+            <Button onClick={() => setShowCreate(true)}>
+              <Plus size={16} aria-hidden="true" />
+              New project
+            </Button>
+          }
+        />
       ) : (
         <div className={styles.grid}>
           {projects.map(p => (

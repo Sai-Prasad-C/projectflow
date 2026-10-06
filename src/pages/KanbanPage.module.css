@@ -1,7 +1,6 @@
 .page {
   display: flex;
   flex-direction: column;
-  /* Stretch to fill the padded main area, then the columns handle their own height */
 }
 
 .header {
@@ -14,6 +13,9 @@
 }
 
 .backLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
   font-size: 13px;
   color: var(--color-text-3);
   text-decoration: none;
@@ -39,14 +41,11 @@
 /* Board wrapper — break out of the parent's horizontal padding so the
    board can use the full available width and scroll cleanly */
 .boardWrap {
-  /* negative margin to eat the parent's side padding, then re-add it as padding
-     so the scrollbar sits at the true edge and cards don't clip */
   margin: 0 calc(-1 * var(--space-6));
   padding: 0 var(--space-6);
   overflow-x: auto;
   overflow-y: visible;
-  /* Allow columns to be visually tall */
-  min-height: calc(100svh - 220px);
+  min-height: calc(100dvh - 220px);
 }
 
 .error {
@@ -68,7 +67,7 @@
 @media (max-width: 768px) {
   .boardWrap {
     margin: 0 calc(-1 * var(--space-4));
-    padding: 0 var(--space-4);
-    min-height: calc(100svh - 270px);
+    padding: 0;
+    min-height: calc(100dvh - 270px);
   }
 }

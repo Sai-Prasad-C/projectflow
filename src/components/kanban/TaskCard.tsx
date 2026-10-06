@@ -80,6 +80,7 @@ export default function TaskCard({
   return (
     <div
       className={cls}
+      data-priority={task.priority}
       draggable
       onDragStart={handleDragStart}
       onDragEnd={onDragEnd}

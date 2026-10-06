@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { ArrowLeft, Kanban } from 'lucide-react'
 import ProjectForm from '../components/project/ProjectForm'
 import Button from '../components/ui/Button'
 import { useWorkspace } from '../hooks/useWorkspace'
@@ -121,7 +122,8 @@ export default function ProjectDashboardPage() {
       <div className={styles.header}>
         <div className={styles.titleArea}>
           <Link to={`/app/${workspaceId}/projects`} className={styles.breadcrumb}>
-            ← Projects
+            <ArrowLeft size={14} aria-hidden="true" />
+            Projects
           </Link>
           <h1 className={styles.title}>{project.name}</h1>
           {isArchived ? <span className={styles.archivedBadge}>Archived</span> : null}
@@ -161,7 +163,8 @@ export default function ProjectDashboardPage() {
         to={`/app/${workspaceId}/projects/${project.id}/board`}
         className={styles.boardLink}
       >
-        Open board →
+        <Kanban size={16} aria-hidden="true" />
+        Open board
       </Link>
 
       {showEdit ? (

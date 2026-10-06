@@ -1,29 +1,32 @@
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+.sheetHeader {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: var(--space-12) var(--space-4);
-  z-index: 200;
-  overflow-y: auto;
-}
-
-.dialog {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 520px;
-  padding: var(--space-6);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
 }
 
 .heading {
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: var(--space-5);
+  margin: 0;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-3);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  transition: color var(--transition), background var(--transition);
+}
+
+.closeBtn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-2);
 }
 
 .field {
@@ -42,14 +45,15 @@
 .input,
 .textarea,
 .select {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
+  padding: 10px 12px;
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-bg);
+  background: var(--color-surface);
   color: var(--color-text);
   font-size: 14px;
   font-family: inherit;
   transition: border-color var(--transition), box-shadow var(--transition);
+  width: 100%;
 }
 
 .input:focus,
@@ -75,6 +79,9 @@
   font-size: 13px;
   color: var(--color-danger);
   margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  border-radius: var(--radius-sm);
 }
 
 .actions {

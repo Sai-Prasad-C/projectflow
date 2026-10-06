@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { X } from 'lucide-react'
 import Button from '../ui/Button'
+import BottomSheet from '../ui/BottomSheet'
 import styles from './TaskForm.module.css'
 import type { MemberProfile, TaskPriority, TaskStatus } from '../../lib/types'
 
@@ -76,100 +78,99 @@ export default function TaskForm({
     if (err) setError(err)
   }
 
-  function handleOverlayClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (e.target === e.currentTarget) onCancel()
-  }
-
   return (
-    <div className={styles.overlay} onClick={handleOverlayClick}>
-      <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="tf-heading">
+    <BottomSheet onClose={onCancel} aria-labelledby="tf-heading">
+      <div className={styles.sheetHeader}>
         <h2 id="tf-heading" className={styles.heading}>{heading}</h2>
-        <form onSubmit={handleSubmit} noValidate>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="tf-title">Title</label>
-            <input
-              id="tf-title"
-              ref={titleRef}
-              className={styles.input}
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              maxLength={500}
-              required
-            />
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="tf-desc">
-              Description <span style={{ fontWeight: 400 }}>(optional)</span>
-            </label>
-            <textarea
-              id="tf-desc"
-              className={styles.textarea}
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              rows={3}
-            />
-          </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="tf-status">Status</label>
-              <select
-                id="tf-status"
-                className={styles.select}
-                value={status}
-                onChange={e => setStatus(e.target.value as TaskStatus)}
-              >
-                {STATUS_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="tf-priority">Priority</label>
-              <select
-                id="tf-priority"
-                className={styles.select}
-                value={priority}
-                onChange={e => setPriority(e.target.value as TaskPriority)}
-              >
-                {PRIORITY_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="tf-assignee">Assignee</label>
-              <select
-                id="tf-assignee"
-                className={styles.select}
-                value={assigneeId}
-                onChange={e => setAssigneeId(e.target.value)}
-              >
-                <option value="">Unassigned</option>
-                {members.map(m => (
-                  <option key={m.user_id} value={m.user_id}>{m.display_name}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="tf-due">Due date</label>
-              <input
-                id="tf-due"
-                type="date"
-                className={styles.input}
-                value={dueDate}
-                onChange={e => setDueDate(e.target.value)}
-              />
-            </div>
-          </div>
-          {error ? <p className={styles.error}>{error}</p> : null}
-          <div className={styles.actions}>
-            <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-            <Button type="submit" loading={loading}>{submitLabel}</Button>
-          </div>
-        </form>
+        <button type="button" className={styles.closeBtn} onClick={onCancel} aria-label="Close">
+          <X size={18} />
+        </button>
       </div>
-    </div>
+      <form onSubmit={handleSubmit} noValidate>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="tf-title">Title</label>
+          <input
+            id="tf-title"
+            ref={titleRef}
+            className={styles.input}
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            maxLength={500}
+            required
+          />
+        </div>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="tf-desc">
+            Description <span style={{ fontWeight: 400 }}>(optional)</span>
+          </label>
+          <textarea
+            id="tf-desc"
+            className={styles.textarea}
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            rows={3}
+          />
+        </div>
+        <div className={styles.row}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="tf-status">Status</label>
+            <select
+              id="tf-status"
+              className={styles.select}
+              value={status}
+              onChange={e => setStatus(e.target.value as TaskStatus)}
+            >
+              {STATUS_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="tf-priority">Priority</label>
+            <select
+              id="tf-priority"
+              className={styles.select}
+              value={priority}
+              onChange={e => setPriority(e.target.value as TaskPriority)}
+            >
+              {PRIORITY_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className={styles.row}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="tf-assignee">Assignee</label>
+            <select
+              id="tf-assignee"
+              className={styles.select}
+              value={assigneeId}
+              onChange={e => setAssigneeId(e.target.value)}
+            >
+              <option value="">Unassigned</option>
+              {members.map(m => (
+                <option key={m.user_id} value={m.user_id}>{m.display_name}</option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="tf-due">Due date</label>
+            <input
+              id="tf-due"
+              type="date"
+              className={styles.input}
+              value={dueDate}
+              onChange={e => setDueDate(e.target.value)}
+            />
+          </div>
+        </div>
+        {error ? <p className={styles.error}>{error}</p> : null}
+        <div className={styles.actions}>
+          <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+          <Button type="submit" loading={loading}>{submitLabel}</Button>
+        </div>
+      </form>
+    </BottomSheet>
   )
 }

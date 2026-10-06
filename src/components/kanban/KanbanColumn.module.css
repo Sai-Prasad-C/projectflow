@@ -4,18 +4,18 @@
   background: var(--color-surface-2);
   border-radius: var(--radius-lg);
   padding: var(--space-3);
-  min-width: 260px;
-  width: 260px;
+  min-width: 270px;
+  width: 270px;
   flex-shrink: 0;
   gap: var(--space-2);
-  /* Cap height so cards scroll independently inside the column */
-  max-height: calc(100svh - 200px);
+  max-height: calc(100dvh - 200px);
+  border: 1px solid transparent;
+  transition: border-color var(--transition), background var(--transition);
 }
 
 .column.dragOver {
   background: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface-2));
-  outline: 2px dashed color-mix(in srgb, var(--color-primary) 40%, transparent);
-  outline-offset: -2px;
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
 .header {
@@ -26,19 +26,20 @@
 }
 
 .statusLabel {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--color-text-2);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .count {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-text-3);
   background: var(--color-surface);
   border-radius: var(--radius-sm);
-  padding: 1px 6px;
+  padding: 1px 7px;
+  font-weight: 500;
 }
 
 .cards {
@@ -47,9 +48,7 @@
   gap: var(--space-2);
   flex: 1;
   min-height: 60px;
-  /* Scrolls independently when the column reaches max-height */
   overflow-y: auto;
-  /* Thin scrollbar */
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
 }
@@ -68,6 +67,9 @@
 }
 
 .addBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   background: none;
   border: none;
   cursor: pointer;
@@ -82,6 +84,17 @@
 }
 
 .addBtn:hover {
-  color: var(--color-text);
-  background: var(--color-surface);
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+/* Mobile: snap-scroll column takes most of viewport width */
+@media (max-width: 768px) {
+  .column {
+    width: 85vw;
+    min-width: 85vw;
+    scroll-snap-align: start;
+    max-height: unset;
+    flex-shrink: 0;
+  }
 }

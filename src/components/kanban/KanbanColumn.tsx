@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import TaskCard from './TaskCard'
 import styles from './KanbanColumn.module.css'
 import type { MemberProfile, Task, TaskStatus } from '../../lib/types'
@@ -105,7 +106,8 @@ export default function KanbanColumn({
       </div>
 
       <button type="button" className={styles.addBtn} onClick={onAddTask}>
-        + Add task
+        <Plus size={14} aria-hidden="true" />
+        Add task
       </button>
     </div>
   )

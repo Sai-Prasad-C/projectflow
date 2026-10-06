@@ -40,10 +40,9 @@ export default defineConfig({
         short_name: 'ProjectFlow',
         description: 'Lightweight collaborative project management',
         // theme_color appears in the browser toolbar and the OS task switcher.
-        theme_color: '#6366f1',
+        theme_color: '#f97316',
         // background_color is shown on the splash screen while the app loads.
-        // Match the dark-mode background so there is no flash on dark devices.
-        background_color: '#0f1117',
+        background_color: '#0f0e0d',
         display: 'standalone',
         scope: '/',
         start_url: '/',
