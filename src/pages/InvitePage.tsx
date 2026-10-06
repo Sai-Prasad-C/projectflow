@@ -76,10 +76,6 @@ export default function InvitePage() {
     navigate(`/app/${state.workspaceId}/projects`, { replace: true })
   }
 
-  function handleAlreadyAccepted() {
-    navigate('/app', { replace: true })
-  }
-
   const content = (() => {
     switch (state.status) {
       case 'loading':
@@ -112,11 +108,10 @@ export default function InvitePage() {
         return (
           <>
             <div className={styles.iconWrap}>
-              <CheckCircle size={48} className={styles.iconSuccess} />
+              <XCircle size={48} className={styles.iconDanger} />
             </div>
-            <h1 className={styles.heading}>Already a member</h1>
-            <p className={styles.body}>You're already a member of this workspace. Head there directly.</p>
-            <Button onClick={handleAlreadyAccepted}>Go to app</Button>
+            <h1 className={styles.heading}>Invitation already used</h1>
+            <p className={styles.body}>This invitation link has already been used. Ask the workspace owner to send a new one.</p>
           </>
         )
 
@@ -152,7 +147,12 @@ export default function InvitePage() {
             <p className={styles.body}>
               This invitation was sent to a different email address. Sign in with the correct account and try the link again.
             </p>
-            <Button variant="ghost" onClick={() => { void supabase.auth.signOut(); navigate('/login') }}>
+            <Button variant="ghost" onClick={() => {
+              // Re-store the token so the next login can resume this invite.
+              if (token) sessionStorage.setItem(PENDING_INVITE_KEY, token)
+              void supabase.auth.signOut()
+              navigate('/login')
+            }}>
               Sign in with a different account
             </Button>
           </>
