@@ -257,3 +257,87 @@ dialogs usable, no excessive whitespace, Kanban usable, text not truncated, tap 
 - Copy brand-specific artwork, illustrations, or proprietary assets from any visual reference.
 - Use indigo as the primary color (was pre-redesign; coral is the new primary).
 - Add heavyweight component libraries (no MUI, Chakra, Ant Design, etc.).
+
+---
+
+## Database development (Supabase CLI)
+
+### Rules — non-negotiable
+- **Schema changes ONLY through migration files** in `supabase/migrations/`. Never modify production schema directly via the Dashboard SQL editor.
+- **Supabase CLI is authoritative** for local and remote schema management.
+- **Regenerate DB types** after every migration: `supabase gen types typescript --linked > src/lib/database.types.ts`
+- **RLS required** on every table. Default-deny. No "disable RLS to debug" shortcuts.
+- **pgTAP tests** required for any RLS policy changes — add to `supabase/tests/`.
+- **NEVER run** `supabase db reset --linked` — destroys production data.
+- **Never expose** service-role key, database password, or JWT secret in `src/` or `VITE_*` variables.
+- **Dry-run before push**: `supabase db push --dry-run` — review output, stop if destructive.
+
+### Workflow
+```bash
+supabase migration new <name>   # create migration file
+# edit the .sql file
+supabase db push --dry-run       # verify
+supabase db push                 # deploy to linked remote
+supabase gen types typescript --linked > src/lib/database.types.ts
+```
+
+### Edge Functions
+- Functions live in `supabase/functions/<name>/index.ts`
+- Deploy: `supabase functions deploy <name>`
+- Secrets (never commit): `supabase secrets set KEY=value`
+- Local dev (requires Docker): `supabase functions serve`
+- Server secrets MUST NOT use `VITE_` prefix — they are not browser env vars.
+- Edge Functions must verify JWT (`Deno.serve` default) — never use `--no-verify-jwt` unless the endpoint is intentionally public and that decision has been reviewed.
+
+---
+
+## Offline architecture
+
+### IndexedDB (`src/lib/idb.ts`)
+- Stores: `tasks`, `comments`, `outbox`, `conflicts`, `sync_meta`
+- `getDB()` lazily opens the DB; `clearUserData()` called on sign-out to isolate private data.
+- IDB is a UX cache — Supabase/RLS remains authoritative when online.
+
+### Sync manager (`src/lib/sync.ts`)
+- `syncManager.sync()` processes the outbox: create/update/delete against Supabase.
+- Retries with bounded exponential backoff (30s → 60s → 120s → … → 600s + jitter).
+- Does NOT retry 401/403/RLS-permanent failures — marks them failed and surfaces in UI.
+- Three-way merge on update conflicts: base + local + remote comparison.
+  - Non-overlapping field changes merge automatically.
+  - Same-field conflicts (both changed differently) are stored in the `conflicts` store and surfaced via `SyncIndicator`.
+
+### Offline writes (outbox pattern)
+1. Validate locally
+2. Write to IDB optimistically
+3. Create an `OutboxEntry` (with `baseSnapshot` and `baseVersion`)
+4. Update React state immediately
+5. Call `syncManager.sync()` — processes if online, queues if offline
+
+### Security constraint
+- Login, registration, password reset, workspace membership admin, invitation creation/acceptance — **remain online-only**.
+- Do NOT pretend security-sensitive remote operations succeeded while offline.
+
+### Hooks pattern
+Hooks read IDB first (fast), then hydrate from network. Realtime events also write through to IDB.
+
+---
+
+## Invitation system
+
+### Database
+- Table: `workspace_invitations` — stores token_hash (SHA-256 hex), email (normalised), role, expiry, accepted_at, revoked_at.
+- Only token hash is stored — plaintext token travels only in the invite URL.
+
+### RPCs (SECURITY DEFINER)
+- `create_workspace_invitation(p_workspace_id, p_email, p_role)` — validates caller is owner/admin, generates 32-byte token, stores hash, returns plaintext token.
+- `accept_workspace_invitation(p_token)` — hashes token, validates expiry/revoke/email match, atomically adds membership, marks accepted. Idempotent.
+
+### Edge Function
+- `send-workspace-invite`: JWT-verified POST; calls the RPC to create invite; optionally delivers email via `EMAIL_PROVIDER_API_KEY` (Resend API format). Email failure does NOT corrupt invitation state.
+- Configuration: `APP_URL`, `EMAIL_PROVIDER_API_KEY`, `INVITE_FROM_EMAIL` — set via `supabase secrets set`.
+
+### Frontend flow
+- Owner/admin sees invite form in MemberList sheet.
+- On success, invite link is shown for copy/share (Web Share API when available).
+- `/invite/:token` → `InvitePage` handles all states: loading, success, expired, revoked, wrong-account, invalid.
+- If unauthenticated on `/invite/:token`: token stored in `sessionStorage`, redirected to login, acceptance resumes after auth.
