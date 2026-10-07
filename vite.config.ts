@@ -39,10 +39,11 @@ export default defineConfig({
         name: 'ProjectFlow',
         short_name: 'ProjectFlow',
         description: 'Lightweight collaborative project management',
-        // theme_color appears in the browser toolbar and the OS task switcher.
-        theme_color: '#11111A',
-        // background_color is shown on the splash screen while the app loads.
-        background_color: '#0f0e0d',
+        // theme_color: PWA install/task-switcher fallback (overridden at runtime
+        // by the <meta name="theme-color"> tag set in the theme bootstrap script).
+        theme_color: '#0B0B12',
+        // background_color: splash screen before JS loads (matches dark --color-bg).
+        background_color: '#0B0B12',
         display: 'standalone',
         scope: '/',
         start_url: '/',

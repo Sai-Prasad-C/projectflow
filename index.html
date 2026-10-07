@@ -7,7 +7,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="application-name" content="ProjectFlow" />
     <meta name="apple-mobile-web-app-title" content="ProjectFlow" />
+    <meta name="theme-color" content="#F7F7FC" />
     <title>ProjectFlow</title>
+    <!--
+      Theme bootstrap — runs before React mounts to prevent flash.
+      Uses the same key/colors as src/context/ThemeContext.tsx.
+      Keep these in sync: THEME_STORAGE_KEY='pf-theme', light='#F7F7FC', dark='#0B0B12'.
+    -->
+    <script>
+      (function () {
+        var pref = localStorage.getItem('pf-theme') || 'system';
+        var resolved = pref === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : pref;
+        document.documentElement.setAttribute('data-theme', resolved);
+        document.documentElement.style.colorScheme = resolved;
+        var colors = { light: '#F7F7FC', dark: '#0B0B12' };
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', colors[resolved]);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

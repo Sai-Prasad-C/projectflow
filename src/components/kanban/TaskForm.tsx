@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { X } from 'lucide-react'
+import { Calendar, X } from 'lucide-react'
 import Button from '../ui/Button'
 import BottomSheet from '../ui/BottomSheet'
 import styles from './TaskForm.module.css'
@@ -156,13 +156,16 @@ export default function TaskForm({
           </div>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="tf-due">Due date</label>
-            <input
-              id="tf-due"
-              type="date"
-              className={styles.input}
-              value={dueDate}
-              onChange={e => setDueDate(e.target.value)}
-            />
+            <div className={styles.dateWrapper}>
+              <input
+                id="tf-due"
+                type="date"
+                className={styles.input}
+                value={dueDate}
+                onChange={e => setDueDate(e.target.value)}
+              />
+              <Calendar size={16} className={styles.dateIcon} aria-hidden="true" />
+            </div>
           </div>
         </div>
         {error ? <p className={styles.error}>{error}</p> : null}

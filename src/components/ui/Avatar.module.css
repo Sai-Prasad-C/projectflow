@@ -30,15 +30,7 @@
 .color4 { background: var(--color-primary-subtle); color: var(--color-primary); }
 .color5 { background: #ede9fe; color: #5b21b6; }
 
-/* Dark-mode overrides — muted backgrounds with light text */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .color0 { background: #2d1f00; color: #fcd34d; }
-  :root:not([data-theme="light"]) .color1 { background: #0c1a3a; color: #93c5fd; }
-  :root:not([data-theme="light"]) .color2 { background: #0a1f14; color: #6ee7b7; }
-  :root:not([data-theme="light"]) .color3 { background: #2a0d1f; color: #f9a8d4; }
-  :root:not([data-theme="light"]) .color5 { background: #1a1035; color: #c4b5fd; }
-}
-
+/* Dark-mode overrides — controlled by app-resolved data-theme, not OS media query */
 [data-theme="dark"] .color0 { background: #2d1f00; color: #fcd34d; }
 [data-theme="dark"] .color1 { background: #0c1a3a; color: #93c5fd; }
 [data-theme="dark"] .color2 { background: #0a1f14; color: #6ee7b7; }
